@@ -15,32 +15,32 @@ class Patient extends Model
     {
         static::creating(function ($patient) {
 
-   if (empty($patient->hospital_id) && Auth::check()) {
-                $patient->hospital_id = Auth::user()->hospital_id;
-            }
+		   if (empty($patient->hospital_id) && Auth::check()) {
+				$patient->hospital_id = Auth::user()->hospital_id;
+			}
 
-            $hospital = Hospital::find($patient->hospital_id);
+			$hospital = Hospital::find($patient->hospital_id);
 
-    $prefix = $hospital?->code ?? 'HSP';
+			$prefix = $hospital?->code ?? 'HSP';
 
-    $year = now()->year;
+			$year = now()->year;
 
-    $lastPatient = self::where('hospital_id', $patient->hospital_id)
-        ->whereYear('created_at', $year)
-        ->latest('id')
-        ->first();
+			$lastPatient = self::where('hospital_id', $patient->hospital_id)
+				->whereYear('created_at', $year)
+				->latest('id')
+				->first();
 
-    $next = $lastPatient
-        ? ((int) substr($lastPatient->patientcode, -6)) + 1
-        : 1;
+			$next = $lastPatient
+				? ((int) substr($lastPatient->patientcode, -6)) + 1
+				: 1;
 
-    $patient->patientcode = sprintf(
-        '%s-%s-%06d',
-        $prefix,
-        $year,
-        $next
-    );
-});
+			$patient->patientcode = sprintf(
+				'%s-%s-%06d',
+				$prefix,
+				$year,
+				$next
+			);
+		});
     }
 	
 	public function hospital(): BelongsTo

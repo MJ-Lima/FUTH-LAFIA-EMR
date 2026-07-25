@@ -8,6 +8,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\Grid;
 use Illuminate\Support\Facades\Auth;
 use App\Models\State;
 
@@ -17,14 +20,21 @@ class PatientForm
     {
         return $schema
             ->components([
-                TextInput::make('firstname')
-                    ->required(),
+                Wizard::make([
+					Step::make('Personal information')
+						->schema([
+							Grid::make()
+							->columns(2)
+							->schema([
+								TextInput::make('firstname')
+                    ->required()->columnOrder(2),
                 TextInput::make('middlename')
-                    ->required(),
+                    ->required()->columnOrder(3),
                 TextInput::make('lastname')
-                    ->required(),
+                    ->required()
+					->columnOrder(1)->label('Surname'),
                 DatePicker::make('dob')
-                    ->required(),
+                    ->required()->columnOrder(4),
 				Select::make('gender')
 					->label('Gender')
 					->options([
@@ -32,7 +42,7 @@ class PatientForm
 						'female' => 'Female',
 					])
 					->preload()
-					->required(),
+					->required()->columnOrder(5),
 				Select::make('bloodgroup')
 					->label('Blood Group')
 					->options([
@@ -45,7 +55,7 @@ class PatientForm
 						'O+'  => 'O+',
 						'O-'  => 'O-',
 					])
-					->preload(),
+					->preload()->columnOrder(6),
                 Select::make('genotype')
 					->label('Genotype')
 					->options([
@@ -56,7 +66,7 @@ class PatientForm
 						'SC' => 'SC',
 						'CC' => 'CC',
 					])
-					->preload(),
+					->preload()->columnOrder(7),
 				Select::make('marital')
 					->label('Marital status')
 					->options([
@@ -66,7 +76,7 @@ class PatientForm
 						'widowed' => 'Widowed',
 					])
 					->preload()
-					->required(),
+					->required()->columnOrder(8),
 				Select::make('religion')
 					->label('Religion')
 					->options([
@@ -75,8 +85,16 @@ class PatientForm
 						'Traditional ' => 'Traditional ',
 					])
 					->preload()
-					->required(),
-                TextInput::make('occupation'),
+					->required()->columnOrder(9),
+							])
+						]),
+					Step::make('Contact information')
+						->schema([
+							
+		Grid::make()
+			->columns(2)
+			->schema([
+				TextInput::make('occupation'),
 				TextInput::make('email')
                     ->label('Email address')
                     ->email(),
@@ -98,24 +116,35 @@ class PatientForm
 				TextInput::make('city')
                     ->required(),
                 TextInput::make('postalcode'),
-                TextInput::make('nokname')
-                    ->required()
-					->label('Next of Kin Full name'),
-                TextInput::make('relationship')
-                    ->required()
-					->label('Next of Kin Relationship.'),
-                TextInput::make('nokphone')
-                    ->tel()
-					->label('Next of Kin Phone no.')
-                    ->required(),
-                Textarea::make('nokaddress')
-                    ->required()
-					->label('Next of Kin Address'),
-                TextInput::make('hereabout')->label('How did you hear about us?'),
-                Textarea::make('notes')->label('Notes'),
-                Toggle::make('status')
-					->label('Active status')
-					->visible(fn () => Auth::user()->can('Disable:Patient')),
+			])
+							
+						]),
+					Step::make('Next of Kin information')
+						->schema([
+							Grid::make()
+								->columns(2)
+								->schema([
+									TextInput::make('nokname')
+										->required()
+										->label('Next of Kin Full name'),
+									TextInput::make('relationship')
+										->required()
+										->label('Next of Kin Relationship.'),
+									TextInput::make('nokphone')
+										->tel()
+										->label('Next of Kin Phone no.')
+										->required(),
+									Textarea::make('nokaddress')
+										->required()
+										->label('Next of Kin Address'),
+									TextInput::make('hereabout')->label('How did you hear about us?'),
+									Textarea::make('notes')->label('Notes'),
+									Toggle::make('status')
+										->label('Active status')
+										->visible(fn () => Auth::user()->can('Disable:Patient')),
+								])
+						]),
+				])->columnSpanFull(),
             ]);
     }
 }
