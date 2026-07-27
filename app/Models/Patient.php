@@ -35,7 +35,7 @@ class Patient extends Model
 				: 1;
 
 			$patient->patientcode = sprintf(
-				'%s-%s-%06d',
+				'%s-%s-%01d',
 				$prefix,
 				$year,
 				$next

@@ -8,6 +8,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Illuminate\Support\Facades\Auth;
+
 
 class EncounterForm
 {
@@ -15,51 +18,66 @@ class EncounterForm
     {
         return $schema
             ->components([
-                TextInput::make('hospital_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('patient_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('clinic_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('user_id')
-                    ->numeric(),
-                TextInput::make('encounter_number')
-                    ->required(),
-                Select::make('visit_type')
+			Select::make('patient_id')
+					->relationship(name: 'patient', titleAttribute: 'patientcode')
+					->searchable() 
+					->preload(),
+            
+			Select::make('clinic_id')
+						->relationship(name: 'clinic', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->where('hospital_id', Auth::user()->hospital_id)->orderBy('name'))
+						->searchable() 
+						->preload(),
+               
+				Section::make('Encounter information')
+				->relationship('hospital')
+				->schema([
+					Select::make('visit_type')
+					->label('Patient type')
                     ->options([
-            'Outpatient' => 'Outpatient',
-            'Emergency' => 'Emergency',
-            'Inpatient' => 'Inpatient',
-            'Telemedicine' => 'Telemedicine',
-            'Follow-up' => 'Follow up',
-        ])
-                    ->required(),
-                DatePicker::make('encounter_date')
-                    ->required(),
-                TimePicker::make('encounter_time')
-                    ->required(),
-                Select::make('status')
+						'Outpatient' => 'Outpatient',
+						'Emergency' => 'Emergency',
+						'Inpatient' => 'Inpatient',
+						'Referal' => 'Referal',
+						'Telemedicine' => 'Telemedicine',
+					])->required(),
+					DatePicker::make('encounter_date')
+						->required(),
+					TimePicker::make('encounter_time')
+						->required(),
+					TextInput::make('referred_by'),
+				]),
+				Section::make('Appointment Information')
+					->relationship('appointment') 
+					->schema([
+						DatePicker::make('appointment_date'),
+						TimePicker::make('appointment_time'),
+						Select::make('visit_type')
+							->options([
+								'New' => 'New',
+								'Follow-up' => 'Follow-up',
+								'Review' => 'Review',
+								'Telemedicine' => 'Telemedicine',
+						]),
+						 Select::make('status')
                     ->options([
-            'Waiting' => 'Waiting',
-            'In Progress' => 'In progress',
-            'Completed' => 'Completed',
-            'Cancelled' => 'Cancelled',
-        ])
+						'Waiting' => 'Waiting',
+						'In Progress' => 'In progress',
+						'Completed' => 'Completed',
+						'Cancelled' => 'Cancelled',
+					])
                     ->default('Waiting')
                     ->required(),
-                Textarea::make('chief_complaint')
-                    ->columnSpanFull(),
-                TextInput::make('referred_by'),
-                TextInput::make('appointment_id')
-                    ->numeric(),
-                TextInput::make('created_by')
-                    ->required()
-                    ->numeric(),
-                Textarea::make('notes')
-                    ->columnSpanFull(),
+				]) ,
+                
+               
+               
+               
+                
+               
+          
+				 Textarea::make('chief_complaint'),
+                Textarea::make('notes'),
+				 
             ]);
     }
 }
