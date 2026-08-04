@@ -15,32 +15,23 @@ class EncountersTable
     {
         return $table
             ->columns([
-                TextColumn::make('hospital_id')
+                TextColumn::make('hospital.code')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('patient_id')
+                TextColumn::make('patient.patientcode')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('clinic_id')
+                TextColumn::make('clinic.name')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
+              
                 TextColumn::make('encounter_number')
                     ->searchable(),
                 TextColumn::make('visit_type')
                     ->badge(),
-                TextColumn::make('encounter_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('encounter_time')
-                    ->time()
-                    ->sortable(),
+                
                 TextColumn::make('status')
                     ->badge(),
-                TextColumn::make('referred_by')
-                    ->searchable(),
                 TextColumn::make('appointment_id')
                     ->numeric()
                     ->sortable(),

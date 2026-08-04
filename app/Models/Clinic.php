@@ -32,4 +32,15 @@ class Clinic extends Model
     {
         return $this->hasMany(Visit::class);
     }
+	
+	public function encounter(): HasMany
+    {
+        return $this->hasMany(Encounter::class);
+    }
+	
+	public function scheduleConfigurations(): HasMany
+    {
+        return $this->hasMany(ScheduleConfiguration::class);
+    }
+	
 }

@@ -47,4 +47,9 @@ class Patient extends Model
     {
         return $this->belongsTo(Hospital::class);
     }
+	
+	public function encounter(): HasMany
+    {
+        return $this->hasMany(Encounter::class);
+    }
 }

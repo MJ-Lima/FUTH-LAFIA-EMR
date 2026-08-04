@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Encounter extends Model
 {
@@ -23,39 +24,28 @@ class Encounter extends Model
         'notes',
     ];
 	
-	protected static function booted()
+	protected static function booted(): void
     {
-        static::creating(function ($encounter) {
-
-		   if (empty($encounter->hospital_id) && Auth::check()) {
-				$encounter->hospital_id = Auth::user()->hospital_id;
-			}
-
-			$hospital = Hospital::find($encounter->hospital_id);
-
-			$prefix = $hospital?->code ?? 'HSP';
-
-			$year = now()->year;
-
-			$lastPatient = self::where('hospital_id', $encounter->hospital_id)
-				->whereYear('created_at', $year)
-				->latest('id')
-				->first();
-
-			$next = $lastPatient
-				? ((int) substr($lastPatient->patientcode, -6)) + 1
-				: 1;
-
-			$encounter->encounter_number = sprintf(
-				'%s-%s-%06d',
-				$prefix,
-				$year,
-				$next
-			);
-			$encounter->user_id = Auth::user()->id;
+        static::creating(function (Encounter $encounter) {
+            $encounter->encounter_number = static::generateNumber();
 			$encounter->created_by = Auth::user()->id;
-		});
+			$encounter->hospital_id = Auth::user()->hospital_id;
+			$encounter->user_id = Auth::user()->id;
+        });
     }
+
+    public static function generateNumber(): string
+    {
+        $year = now()->format('Y');
+        $last = static::where('encounter_number', 'like', "ENC-{$year}-%")
+            ->latest('id')
+            ->first();
+
+        $next = $last ? ((int) substr($last->encounter_number, -5)) + 1 : 1;
+
+        return "ENC-{$year}-" . str_pad($next, 5, '0', STR_PAD_LEFT);
+    }
+
 	
 	
 	 public function hospital()

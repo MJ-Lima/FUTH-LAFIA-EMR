@@ -6,10 +6,14 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use App\Models\ScheduleConfiguration;
 
 
 class EncounterForm
@@ -18,16 +22,22 @@ class EncounterForm
     {
         return $schema
             ->components([
-			Select::make('patient_id')
+				Select::make('patient_id')
 					->relationship(name: 'patient', titleAttribute: 'patientcode')
 					->searchable() 
-					->preload(),
-            
+					->preload()
+					->live()
+					->afterStateUpdated(function(Set $set, $state) {
+						$set('appointment.patient_id', $state);
+						$set('appointment.appointment_date', null);
+                        $set('appointment.appointment_time', null);
+					}),
 			Select::make('clinic_id')
 						->relationship(name: 'clinic', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->where('hospital_id', Auth::user()->hospital_id)->orderBy('name'))
 						->searchable() 
-						->preload(),
-               
+						->preload()
+						->live()
+					->afterStateUpdated(fn (Set $set, $state) => $set('appointment.clinic_id', $state)),
 				Section::make('Encounter information')
 				->relationship('hospital')
 				->schema([
@@ -40,17 +50,54 @@ class EncounterForm
 						'Referal' => 'Referal',
 						'Telemedicine' => 'Telemedicine',
 					])->required(),
-					DatePicker::make('encounter_date')
-						->required(),
-					TimePicker::make('encounter_time')
-						->required(),
+					
+										
 					TextInput::make('referred_by'),
 				]),
 				Section::make('Appointment Information')
 					->relationship('appointment') 
 					->schema([
-						DatePicker::make('appointment_date'),
-						TimePicker::make('appointment_time'),
+						Hidden::make('patient_id'),
+						Hidden::make('clinic_id'),
+						DatePicker::make('appointment_date')
+						->required()
+						->live()
+						->minDate(now())
+						->disabled(fn (Get $get) => ! $get('../clinic_id'))
+						->disabledDates(function (Get $get) {
+							$clinicId = $get('../clinic_id');
+
+							if (! $clinicId) {
+								return [];
+							}
+
+							$activeDays = ScheduleConfiguration::activeDaysForClinic($clinicId);
+
+							return collect(range(0, 60))
+								->map(fn ($i) => now()->addDays($i))
+								->filter(fn ($date) => ! in_array($date->dayOfWeek, $activeDays))
+								->map(fn ($date) => $date->format('Y-m-d'))
+								->toArray();
+						})
+						->afterStateUpdated(fn (Set $set) => $set('appointment_time', null)),
+						Select::make('appointment_time')
+							->label('Time Slot')
+							->options(function (Get $get) {
+								$clinicId = $get('../clinic_id');
+								$date = $get('appointment_date');
+
+								if (! $clinicId || ! $date) {
+									return [];
+								}
+
+								return collect(ScheduleConfiguration::getAvailableSlots($clinicId, $date))
+									->mapWithKeys(fn ($slot) => [$slot => $slot])
+									->toArray();
+							})
+							->required()
+							->disabled(fn (Get $get) => ! $get('appointment_date'))
+							->live(),
+						
 						Select::make('visit_type')
 							->options([
 								'New' => 'New',
@@ -75,7 +122,7 @@ class EncounterForm
                 
                
           
-				 Textarea::make('chief_complaint'),
+				Textarea::make('chief_complaint'),
                 Textarea::make('notes'),
 				 
             ]);

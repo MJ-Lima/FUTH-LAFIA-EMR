@@ -30,11 +30,11 @@ return new class extends Migration
 				'Inpatient',
 				'Telemedicine',
 				'Follow-up'
-			]);
+			])->nullable();
 
-			$table->date('encounter_date');
+			$table->date('encounter_date')->nullable();
 
-			$table->time('encounter_time');
+			$table->time('encounter_time')->nullable();
 
 			$table->enum('status', [
 				'Waiting',

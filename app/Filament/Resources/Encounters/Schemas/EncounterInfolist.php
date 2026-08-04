@@ -11,10 +11,11 @@ class EncounterInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('hospital_id')
-                    ->numeric(),
+                TextEntry::make('hospital.name')
+					->label('Hospital'),
                 TextEntry::make('patient_id')
-                    ->numeric(),
+				->label('Patient Full name')
+				->state(fn ($record) => "{$record->patient->lastname} {$record->patient->firstname} {$record->patient->middlename}"),
                 TextEntry::make('clinic_id')
                     ->numeric(),
                 TextEntry::make('user_id')
@@ -23,18 +24,15 @@ class EncounterInfolist
                 TextEntry::make('encounter_number'),
                 TextEntry::make('visit_type')
                     ->badge(),
-                TextEntry::make('encounter_date')
-                    ->date(),
-                TextEntry::make('encounter_time')
-                    ->time(),
                 TextEntry::make('status')
                     ->badge(),
                 TextEntry::make('chief_complaint')
                     ->placeholder('-')
                     ->columnSpanFull(),
-                TextEntry::make('referred_by')
+                TextEntry::make('appointment.appointment_date')
+                    ->numeric()
                     ->placeholder('-'),
-                TextEntry::make('appointment_id')
+                TextEntry::make('appointment.appointment_time')
                     ->numeric()
                     ->placeholder('-'),
                 TextEntry::make('created_by')
