@@ -13,66 +13,69 @@ return new class extends Migration
     {
        Schema::create('appointments', function (Blueprint $table) {
 
-			$table->id();
+                        $table->id();
 
-			$table->foreignId('hospital_id')->constrained()->cascadeOnDelete();
+                        $table->foreignId('hospital_id')->constrained()->cascadeOnDelete();
 
-			$table->foreignId('patient_id')->constrained()->cascadeOnDelete();
+                        $table->foreignId('patient_id')->constrained()->cascadeOnDelete();
 
-			$table->foreignId('clinic_id')->constrained()->cascadeOnDelete();
+                        $table->foreignId('clinic_id')->constrained()->cascadeOnDelete();
 
-			$table->foreignId('provider_id')
-				->nullable()
-				->constrained('users')
-				->nullOnDelete();
+                        $table->foreignId('provider_id')
+                                ->nullable()
+                                ->constrained('users')
+                                ->nullOnDelete();
 
-			$table->string('appointment_number')->unique();
+                        $table->string('appointment_number')->unique();
 
-			$table->date('appointment_date');
+                        $table->date('appointment_date');
 
-			$table->time('appointment_time');
+                        $table->time('appointment_time');
 
-			$table->unsignedInteger('estimated_duration')->default(30);
+                        $table->unsignedInteger('estimated_duration')->default(30);
 
-			$table->enum('visit_type', [
-				'New',
-				'Follow-up',
-				'Review',
-				'Telemedicine',
-			]);
+                        $table->enum('visit_type', [
+                                'New',
+                                'Follow-up',
+                                'Review',
+                                'Telemedicine',
+                        ]);
 
-			$table->enum('priority', [
-				'Routine',
-				'Urgent',
-				'Emergency',
-			])->default('Routine');
+                        $table->enum('priority', [
+                                'Routine',
+                                'Urgent',
+                                'Emergency',
+                        ])->default('Routine');
 
-			$table->text('reason_for_visit');
+                        $table->text('reason_for_visit');
 
-			$table->enum('status', [
-				'Scheduled',
-				'Confirmed',
-				'Checked In',
-				'Completed',
-				'Cancelled',
-				'No Show',
-			])->default('Scheduled');
+                        $table->enum('status', [
+                                'Scheduled',
+                                'Confirmed',
+                                'Checked In',
+                                'Completed',
+                                'Cancelled',
+                                'No Show',
+                        ])->default('Scheduled');
 
-			$table->foreignId('encounter_id')
-				->nullable()
-				->constrained()
-				->nullOnDelete();
+                        // Note: encounter_id is nullable + indexed but not FK-constrained
+                        // because appointments can precede encounters (circular reference).
+                        // Encounters.appointment_id is FK-constrained to this table.
+                        $table->foreignId('encounter_id')
+                                ->nullable()
+                                ->index()
+                                ->nullOnDelete();
 
-			$table->foreignId('created_by')
-				->constrained('users')
-				->cascadeOnDelete();
+                        $table->foreignId('created_by')
+                                ->constrained('users')
+                                ->cascadeOnDelete();
 
-			$table->text('notes')->nullable();
+                        $table->text('notes')->nullable();
 
-			$table->text('cancellation_reason')->nullable();
+                        $table->text('cancellation_reason')->nullable();
 
-			$table->timestamps();
-		});
+                        $table->timestamps();
+                });
     }
 
     /**

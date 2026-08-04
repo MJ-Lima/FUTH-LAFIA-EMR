@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Encounters\Pages;
 
+use Filament\Schemas\Schema;
+
 use App\Filament\Resources\Encounters\EncounterResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;

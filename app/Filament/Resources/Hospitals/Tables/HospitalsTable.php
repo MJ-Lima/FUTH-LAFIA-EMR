@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Hospitals\Tables;
 
+use Filament\Schemas\Schema;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;

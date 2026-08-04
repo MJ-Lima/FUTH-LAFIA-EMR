@@ -1,66 +1,220 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FUTH-Lafia EMR
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Federal University Teaching Hospital, Lafia — Electronic Medical Record System**
 
-## About Laravel
+A complete hospital information system built with **Laravel 12**, **Filament v5** (admin panel + Livewire), **Spatie Permission** (role-based access control) and **Filament Shield** (permission scaffolding). The system implements international healthcare standards including ICD-10, LOINC, ATC, DICOM modality codes and ISO 3166-2:NG (Nigerian states & LGAs).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tech Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Layer | Technology |
+|-------|-----------|
+| Backend | Laravel 12 (PHP 8.2+) |
+| Admin UI | Filament v5 (Livewire 3) |
+| RBAC | spatie/laravel-permission + bezhansalleh/filament-shield |
+| Database | MySQL 8 / MariaDB 10.6+ |
+| Frontend assets | Vite, Tailwind CSS (bundled with Filament) |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Modules
 
-## Learning Laravel
+The system is organized into six clinical/administrative modules covering the full patient journey:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Patient Management
+- **Patients** — demographics, next-of-kin, vital statistics, full clinical timeline
+- **Encounters** — outpatient, inpatient, emergency, telemedicine, follow-up
+- **Appointments** — scheduling, check-in, priority, cancellation tracking
+- **Clinical Notes** — SOAP-format notes (Progress, Admission, Discharge, Nursing, Procedure, Consultation, Referral, Death), signing & locking
+- **Vitals** — anthropometric, cardiovascular, respiratory, thermoregulatory, neurological, glucose, maternal
+- **Allergies** — drug/food/environmental with severity, criticality, reaction
+- **Diagnoses** — ICD-10 coded, with type (Principal/Working/Discharge/Secondary) and status (Active/Chronic/Resolved)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Laboratory
+- **Lab Panels** — bundled test panels (FBC, LFT, RFT, Lipid Profile, Urinalysis, etc.) with **LOINC** codes
+- **Lab Tests** — individual analytes with reference ranges, specimen type, container, turnaround time
+- **Lab Orders** — multi-test orders with priority (Routine/Urgent/STAT/ASAP), status workflow, results & verification
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Radiology
+- **Radiology Modalities** — XRAY, US, CT, MR, FL, MG, DUS, IVR (DICOM modality codes)
+- **Radiology Orders** — examination request with clinical indication, priority, status workflow
+- **Radiology Results** — findings, impression, recommendations, image attachment, verification
 
-## Laravel Sponsors
+### Pharmacy
+- **Drug Catalog** — WHO Essential Medicines List aligned, **ATC** coded, with safety flags (controlled, antenatal-safe, paediatric-safe)
+- **Drug Batches** — batch tracking, expiry monitoring, quarantine
+- **Drug Interactions** — drug-drug interaction database with severity (Minor/Moderate/Major/Contraindicated)
+- **Suppliers** — vendor master with contact & compliance details
+- **Purchases** — local purchase orders with line items, tax, discount, payment status
+- **Receipts** — goods received notes against purchase orders
+- **Dispensing Points** — Main Pharmacy, ANC, Paediatric, Emergency, Inpatient, Theatre
+- **Prescriptions** — Rx with items, dose/route/frequency/duration, status workflow
+- **Dispensing Logs** — issue logs with batch tracking and pricing
+- **Stock Movements** — Receipt, Transfer In/Out, Dispense, Adjustment, Return, Disposal, Stock Take
+- **Stock Returns** — patient returns, expired/damaged/wrong dispense, disposition (Restocked/Quarantined/Disposed)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Administration
+- **Hospitals**, **Clinics**, **Departments**, **Staff**, **Users**, **Roles & Permissions**
+- **Medical Administration Dashboard** — overview stats (patients today, encounters, appointments, pending lab/radiology/pharmacy), encounters trend chart, encounters by visit type, appointments by status, top dispensed drugs chart
 
-### Premium Partners
+## International Standards Compliance
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+| Standard | Usage |
+|----------|-------|
+| **ICD-10** (WHO) | Diagnosis coding |
+| **LOINC** | Laboratory test identification |
+| **ATC** (WHO) | Drug classification (Anatomical Therapeutic Chemical) |
+| **DICOM** | Radiology modality codes (XRAY, CT, MR, US, etc.) |
+| **ISO 3166-2:NG** | Nigerian states & LGAs (ISO subdivision codes) |
+| **HL7 FHIR** | Conceptual model inspiration — Patient, Encounter, Observation, Condition, AllergyIntolerance, DiagnosticReport, ImagingStudy, Composition |
+| **WHO EML** | Essential Medicines List — seed drug catalog |
 
-## Contributing
+## Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prerequisites
+- PHP 8.2+ with extensions: pdo_mysql, mbstring, xml, bcmath, ctype, json, tokenizer, openssl
+- Composer 2+
+- MySQL 8 / MariaDB 10.6+
+- Node.js 18+ & npm (for frontend assets, optional — Filament ships pre-built)
 
-## Code of Conduct
+### Steps
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 1. Clone / extract the project
+cd futh-lafia-emr
 
-## Security Vulnerabilities
+# 2. Install PHP dependencies
+composer install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 3. Install frontend dependencies (optional — Filament assets ship pre-built)
+npm install && npm run build
+
+# 4. Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# 5. Edit .env — set your database credentials
+#    DB_DATABASE=fulth_emr
+#    DB_USERNAME=your_user
+#    DB_PASSWORD=your_password
+
+# 6. Import the database dump (includes schema + seed data)
+mysql -u your_user -p fulth_emr < database/fulth-emr.sql
+
+# 7. OR run migrations + seeders (alternative to step 6)
+# php artisan migrate --seed
+
+# 8. Link storage
+php artisan storage:link
+
+# 9. Serve
+php artisan serve
+# Visit http://localhost:8000/admin
+```
+
+### Default Login Credentials
+
+All seeded accounts use the password: **`password`**
+
+| Role | Email |
+|------|-------|
+| Medical Administrator | `admin@futhlafia.gov.ng` |
+| Doctor | `dr.okoro@futhlafia.gov.ng` |
+| Doctor (Obs & Gyn) | `dr.adebayo@futhlafia.gov.ng` |
+| Nurse | `nurse.john@futhlafia.gov.ng` |
+| Pharmacist | `pharm.musa@futhlafia.gov.ng` |
+| Laboratory Scientist | `lab.aisha@futhlafia.gov.ng` |
+| Radiographer | `rad.tunde@futhlafia.gov.ng` |
+| Medical Records Officer | `records.hauwa@futhlafia.gov.ng` |
+| Accountant | `accounts.david@futhlafia.gov.ng` |
+
+## Database
+
+The complete database schema + seed data is provided in `database/fulth-emr.sql` (127 KB, 49 tables, 33 INSERT statements). Import via:
+
+```bash
+mysql -u root -p -e "CREATE DATABASE fulth_emr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p fulth_emr < database/fulth-emr.sql
+```
+
+Alternatively, run Laravel migrations + seeders:
+
+```bash
+php artisan migrate --seed
+```
+
+### Key Tables
+- `users`, `staff`, `hospitals`, `departments`, `clinics`, `states`, `locals`
+- `patients`, `encounters`, `appointments`
+- `clinical_notes`, `vitals`, `allergies`, `diagnoses`
+- `lab_panels`, `lab_tests`, `lab_orders`, `lab_order_items`, `lab_results`
+- `radiology_modalities`, `radiology_orders`, `radiology_results`
+- `drug_categories`, `drugs`, `drug_batches`, `drug_interactions`
+- `suppliers`, `purchases`, `purchase_items`, `receipts`, `receipt_items`
+- `dispensing_points`, `prescriptions`, `prescription_items`
+- `dispensing_logs`, `stock_movements`, `stock_returns`
+- `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, `role_has_permissions`
+
+## Roles & Permissions
+
+Nine EMR-aligned roles are seeded by default:
+
+1. **Super Admin** — all permissions
+2. **Medical Administrator** — clinical oversight + read access across modules
+3. **Doctor** — clinical workflow (patients, encounters, notes, vitals, allergies, diagnoses, lab/radiology orders, prescriptions)
+4. **Nurse** — patient care (patients, encounters, vitals, nursing notes, allergies)
+5. **Pharmacist** — full pharmacy workflow
+6. **Laboratory Scientist** — lab catalog + lab order processing
+7. **Radiographer** — radiology modalities + order processing
+8. **Medical Records Officer** — patient registration + encounter scheduling
+9. **Accountant** — read-only access to financial modules
+
+Permission generation via Filament Shield:
+
+```bash
+php artisan shield:generate --all
+php artisan shield:super-admin
+```
+
+## Project Structure
+
+```
+app/
+├── Filament/
+│   ├── Resources/         # 30+ Filament resources organized by module
+│   │   ├── Patients/      # + 9 RelationManagers (clinical timeline)
+│   │   ├── Encounters/    # + 7 RelationManagers
+│   │   ├── Appointments/
+│   │   ├── ClinicalNotes/
+│   │   ├── Vitals/
+│   │   ├── Allergies/
+│   │   ├── Diagnoses/
+│   │   ├── LabPanels/ LabTests/ LabOrders/
+│   │   ├── RadiologyModalities/ RadiologyOrders/
+│   │   ├── DrugCategories/ Drugs/ DrugBatches/ DrugInteractions/
+│   │   ├── Suppliers/ Purchases/ Receipts/
+│   │   ├── DispensingPoints/ Prescriptions/ DispensingLogs/
+│   │   ├── StockMovements/ StockReturns/
+│   │   ├── Hospitals/ Clinics/ Departments/ Users/
+│   │   └── Each resource has: Pages/, Schemas/{Form,Infolist}, Tables/
+│   └── Widgets/           # Dashboard widgets (overview + 4 charts)
+├── Models/                # 35+ Eloquent models with relationships
+├── Policies/              # 28 policies (filament-shield compatible)
+└── Providers/
+    └── Filament/
+        └── AdminPanelProvider.php
+database/
+├── migrations/            # 30+ migration files
+├── seeders/               # 10 seeder classes (international-standard data)
+└── fulth-emr.sql          # Complete database dump (schema + seed)
+```
+
+## Security
+
+- All passwords are bcrypt-hashed (Laravel default)
+- Role-based access control via Spatie Permission
+- Per-resource policies (view/create/update/delete/restore/force-delete)
+- Authentication required for all admin routes
+- CSRF protection on all forms
+- Audit-ready: every clinical record tracks `created_by`, `updated_at`, soft-deletes where appropriate
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed for use by Federal University Teaching Hospital, Lafia. The underlying Laravel framework is MIT-licensed.

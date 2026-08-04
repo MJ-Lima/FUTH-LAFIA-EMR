@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Patients\Pages;
 
+use Filament\Schemas\Schema;
+
 use App\Filament\Resources\Patients\PatientResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;

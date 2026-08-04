@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class Appointment extends Model
 {
@@ -25,28 +24,7 @@ class Appointment extends Model
         'notes',
         'cancellation_reason',
     ];
-	
-	protected static function booted(): void
-    {
-        static::creating(function (Appointment $appointment) {
-            $appointment->appointment_number = static::generateNumber();
-			$appointment->hospital_id = Auth::user()->hospital_id;
-			$appointment->created_by = Auth::user()->id;
-        });
-    }
 
-    public static function generateNumber(): string
-    {
-        $year = now()->format('Y');
-        $last = static::where('appointment_number', 'like', "APT-{$year}-%")
-            ->latest('id')
-            ->first();
-
-        $next = $last ? ((int) substr($last->appointment_number, -5)) + 1 : 1;
-
-        return "APT-{$year}-" . str_pad($next, 5, '0', STR_PAD_LEFT);
-    }
-	
     public function patient()
     {
         return $this->belongsTo(Patient::class);

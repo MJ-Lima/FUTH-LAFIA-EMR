@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Encounters\Schemas;
 
-use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
+
+use Filament\Infolists\Components\TextEntry;
+
 
 class EncounterInfolist
 {
@@ -11,11 +13,10 @@ class EncounterInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('hospital.name')
-					->label('Hospital'),
+                TextEntry::make('hospital_id')
+                    ->numeric(),
                 TextEntry::make('patient_id')
-				->label('Patient Full name')
-				->state(fn ($record) => "{$record->patient->lastname} {$record->patient->firstname} {$record->patient->middlename}"),
+                    ->numeric(),
                 TextEntry::make('clinic_id')
                     ->numeric(),
                 TextEntry::make('user_id')
@@ -24,15 +25,18 @@ class EncounterInfolist
                 TextEntry::make('encounter_number'),
                 TextEntry::make('visit_type')
                     ->badge(),
+                TextEntry::make('encounter_date')
+                    ->date(),
+                TextEntry::make('encounter_time')
+                    ->time(),
                 TextEntry::make('status')
                     ->badge(),
                 TextEntry::make('chief_complaint')
                     ->placeholder('-')
                     ->columnSpanFull(),
-                TextEntry::make('appointment.appointment_date')
-                    ->numeric()
+                TextEntry::make('referred_by')
                     ->placeholder('-'),
-                TextEntry::make('appointment.appointment_time')
+                TextEntry::make('appointment_id')
                     ->numeric()
                     ->placeholder('-'),
                 TextEntry::make('created_by')

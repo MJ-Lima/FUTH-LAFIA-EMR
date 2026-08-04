@@ -2,6 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\AppointmentsByStatusChart;
+use App\Filament\Widgets\EncountersByTypeChart;
+use App\Filament\Widgets\EncountersTrendChart;
+use App\Filament\Widgets\MedicalAdministrationOverview;
+use App\Filament\Widgets\TopDispensedDrugsChart;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -12,7 +17,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -39,8 +43,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                MedicalAdministrationOverview::class,
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                EncountersTrendChart::class,
+                EncountersByTypeChart::class,
+                AppointmentsByStatusChart::class,
+                TopDispensedDrugsChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -56,8 +64,8 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-			->plugins([
-				FilamentShieldPlugin::make(),
-			]);
+            ->plugins([
+                FilamentShieldPlugin::make(),
+            ]);
     }
 }
