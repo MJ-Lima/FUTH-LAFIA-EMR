@@ -2,14 +2,10 @@
 
 namespace App\Filament\Resources\Diagnoses\Schemas;
 
+use Filament\Forms\Components\DatePicker, Select, TextInput, Textarea;
 use Filament\Schemas\Schema;
-
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 
 class DiagnosisForm
 {
@@ -17,52 +13,20 @@ class DiagnosisForm
     {
         return $schema
             ->components([
-                Section::make('Patient')
+                Section::make('Diagnosis Details')
                     ->schema([
-                        Select::make('patient_id')
-                            ->relationship('patient', 'patientcode')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Select::make('encounter_id')
-                            ->relationship('encounter', 'encounter_number')
-                            ->searchable()
-                            ->preload(),
-                    ])->columns(2),
-                Section::make('Diagnosis')
-                    ->schema([
-                        TextInput::make('icd10_code')
-                            ->label('ICD-10 Code')
-                            ->maxLength(10)
-                            ->required()
-                            ->placeholder('e.g. J00, E11.9, O00.0'),
-                        TextInput::make('description')
-                            ->required()
-                            ->maxLength(255),
-                        Select::make('type')
-                            ->options([
-                                'Principal' => 'Principal',
-                                'Admitting' => 'Admitting',
-                                'Working' => 'Working',
-                                'Discharge' => 'Discharge',
-                                'Secondary' => 'Secondary',
-                                'Comorbidity' => 'Comorbidity',
-                            ])
-                            ->default('Working')
-                            ->required(),
-                        Select::make('status')
-                            ->options([
-                                'Active' => 'Active',
-                                'Resolved' => 'Resolved',
-                                'Chronic' => 'Chronic',
-                                'Recurrent' => 'Recurrent',
-                            ])
-                            ->default('Active')
-                            ->required(),
-                        DatePicker::make('onset_date')->label('Onset date'),
-                        DatePicker::make('resolved_date')->label('Resolved date'),
-                        Textarea::make('notes')->rows(2),
-                    ])->columns(2),
+                        Grid::make(2)->schema([
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('encounter_id')->label('Encounter')->relationship('encounter', 'encounter_number')->searchable()->preload(),
+                            TextInput::make('icd10_code')->label('ICD-10 Code')->required(),
+                            TextInput::make('description')->label('Description')->required(),
+                            Select::make('type')->label('Type')->required()->options(['Principal' => 'Principal', 'Admitting' => 'Admitting', 'Working' => 'Working', 'Discharge' => 'Discharge', 'Secondary' => 'Secondary', 'Comorbidity' => 'Comorbidity'])->searchable(),
+                            Select::make('status')->label('Status')->required()->options(['Active' => 'Active', 'Resolved' => 'Resolved', 'Chronic' => 'Chronic', 'Recurrent' => 'Recurrent'])->searchable(),
+                            DatePicker::make('onset_date')->label('Onset Date'),
+                            DatePicker::make('resolved_date')->label('Resolved Date'),
+                            Textarea::make('notes')->label('Notes'),
+                        ]),
+                    ]),
             ]);
     }
 }

@@ -2,14 +2,10 @@
 
 namespace App\Filament\Resources\StockMovements\Schemas;
 
+use Filament\Forms\Components\DateTimePicker, Select, TextInput, Textarea;
 use Filament\Schemas\Schema;
-
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 
 class StockMovementForm
 {
@@ -17,64 +13,20 @@ class StockMovementForm
     {
         return $schema
             ->components([
-                Section::make('Item')
+                Section::make('StockMovement Details')
                     ->schema([
-                        Select::make('drug_id')
-                            ->label('Drug')
-                            ->relationship('drug', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Select::make('drug_batch_id')
-                            ->label('Batch')
-                            ->relationship('batch', 'batch_number')
-                            ->searchable()
-                            ->preload(),
-                        Select::make('dispensing_point_id')
-                            ->label('Dispensing point')
-                            ->relationship('dispensingPoint', 'name')
-                            ->searchable()
-                            ->preload(),
-                    ])->columns(3),
-
-                Section::make('Movement')
-                    ->schema([
-                        Select::make('type')
-                            ->label('Type')
-                            ->options([
-                                'Receipt' => 'Receipt',
-                                'Transfer In' => 'Transfer In',
-                                'Transfer Out' => 'Transfer Out',
-                                'Dispense' => 'Dispense',
-                                'Adjustment In' => 'Adjustment In',
-                                'Adjustment Out' => 'Adjustment Out',
-                                'Return' => 'Return',
-                                'Disposal' => 'Disposal',
-                                'Stock Take' => 'Stock Take',
-                            ])
-                            ->required(),
-                        TextInput::make('reference_number')
-                            ->label('Reference #')
-                            ->maxLength(120),
-                        DateTimePicker::make('movement_date')
-                            ->label('Movement date')
-                            ->default(now())
-                            ->required(),
-                        TextInput::make('quantity')
-                            ->label('Quantity (negative for out)')
-                            ->numeric()
-                            ->required()
-                            ->step(0.01)
-                            ->helperText('Positive for inward movements, negative for outward movements.'),
-                        TextInput::make('balance_after')
-                            ->label('Balance after')
-                            ->numeric()
-                            ->step(0.01),
-                        Textarea::make('reason')
-                            ->label('Reason')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                        Grid::make(2)->schema([
+                            Select::make('drug_id')->label('Drug')->required()->relationship('drug', 'name')->searchable()->preload(),
+                            Select::make('drug_batch_id')->label('Batch')->relationship('drugBatch', 'batch_number')->searchable()->preload(),
+                            Select::make('dispensing_point_id')->label('Dispensing Point')->relationship('dispensingPoint', 'name')->searchable()->preload(),
+                            Select::make('type')->label('Movement Type')->required()->options(['Receipt' => 'Receipt', 'Transfer In' => 'Transfer In', 'Transfer Out' => 'Transfer Out', 'Dispense' => 'Dispense', 'Adjustment In' => 'Adjustment In', 'Adjustment Out' => 'Adjustment Out', 'Return' => 'Return', 'Disposal' => 'Disposal', 'Stock Take' => 'Stock Take'])->searchable(),
+                            TextInput::make('reference_number')->label('Reference #'),
+                            DateTimePicker::make('movement_date')->label('Movement Date')->required(),
+                            TextInput::make('quantity')->label('Quantity')->numeric(),
+                            TextInput::make('balance_after')->label('Balance After')->numeric(),
+                            Textarea::make('reason')->label('Reason'),
+                        ]),
+                    ]),
             ]);
     }
 }

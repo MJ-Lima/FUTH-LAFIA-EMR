@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Filament\Resources\Drugs\Pages;
-use Filament\Schemas\Schema;
 
 use App\Filament\Resources\Drugs\DrugResource;
 use Filament\Resources\Pages\CreateRecord;

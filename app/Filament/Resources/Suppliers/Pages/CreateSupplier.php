@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Suppliers\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Suppliers\SupplierResource;
 use Filament\Resources\Pages\CreateRecord;
 

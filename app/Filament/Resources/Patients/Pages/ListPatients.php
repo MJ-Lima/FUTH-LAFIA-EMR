@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Patients\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Patients\PatientResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
@@ -12,10 +10,11 @@ class ListPatients extends ListRecords
 {
     protected static string $resource = PatientResource::class;
 
-    protected function getHeaderActions(): array
+    public function getHeaderActions(): array
     {
-        return [
-            CreateAction::make(),
-        ];
+        if (!auth()->user()?->can('create patient')) {
+            return [];
+        }
+        return [CreateAction::make()];  
     }
 }

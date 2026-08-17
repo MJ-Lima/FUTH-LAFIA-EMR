@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\LabPanels;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\LabPanels\Pages\CreateLabPanel;
 use App\Filament\Resources\LabPanels\Pages\EditLabPanel;
 use App\Filament\Resources\LabPanels\Pages\ListLabPanels;
@@ -11,22 +9,27 @@ use App\Filament\Resources\LabPanels\Pages\ViewLabPanel;
 use App\Filament\Resources\LabPanels\Schemas\LabPanelForm;
 use App\Filament\Resources\LabPanels\Schemas\LabPanelInfolist;
 use App\Filament\Resources\LabPanels\Tables\LabPanelsTable;
+use App\Filament\Traits\HasUnitScoping;
 use App\Models\LabPanel;
 use BackedEnum;
 use Filament\Resources\Resource;
-
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class LabPanelResource extends Resource
 {
+    use HasUnitScoping;
+
     protected static ?string $model = LabPanel::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Laboratory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Laboratory';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'code';
 
     public static function form(Schema $schema): Schema
     {
@@ -43,20 +46,23 @@ class LabPanelResource extends Resource
         return LabPanelsTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => ListLabPanels::route('/'),
+            'index'  => ListLabPanels::route('/'),
             'create' => CreateLabPanel::route('/create'),
-            'view' => ViewLabPanel::route('/{record}'),
-            'edit' => EditLabPanel::route('/{record}/edit'),
+            'view'   => ViewLabPanel::route('/{record}'),
+            'edit'   => EditLabPanel::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getEloquentQuery()->count());
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 }

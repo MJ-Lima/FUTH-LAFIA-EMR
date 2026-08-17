@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\LabPanels\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\LabPanels\LabPanelResource;
 use Filament\Resources\Pages\CreateRecord;
 

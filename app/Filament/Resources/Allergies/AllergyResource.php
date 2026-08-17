@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Allergies;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Allergies\Pages\CreateAllergy;
 use App\Filament\Resources\Allergies\Pages\EditAllergy;
 use App\Filament\Resources\Allergies\Pages\ListAllergies;
@@ -11,22 +9,27 @@ use App\Filament\Resources\Allergies\Pages\ViewAllergy;
 use App\Filament\Resources\Allergies\Schemas\AllergyForm;
 use App\Filament\Resources\Allergies\Schemas\AllergyInfolist;
 use App\Filament\Resources\Allergies\Tables\AllergiesTable;
+use App\Filament\Traits\HasUnitScoping;
 use App\Models\Allergy;
 use BackedEnum;
 use Filament\Resources\Resource;
-
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class AllergyResource extends Resource
 {
+    use HasUnitScoping;
+
     protected static ?string $model = Allergy::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationTriangle;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Clinical';
+    protected static string|\UnitEnum|null $navigationGroup = 'Clinical';
 
-    protected static ?string $recordTitleAttribute = 'substance';
+    protected static ?int $navigationSort = 7;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
     {
@@ -43,20 +46,23 @@ class AllergyResource extends Resource
         return AllergiesTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => ListAllergies::route('/'),
+            'index'  => ListAllergies::route('/'),
             'create' => CreateAllergy::route('/create'),
-            'view' => ViewAllergy::route('/{record}'),
-            'edit' => EditAllergy::route('/{record}/edit'),
+            'view'   => ViewAllergy::route('/{record}'),
+            'edit'   => EditAllergy::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getEloquentQuery()->count());
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 }

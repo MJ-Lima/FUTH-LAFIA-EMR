@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\ClinicalNotes\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\ClinicalNotes\ClinicalNoteResource;
 use Filament\Resources\Pages\CreateRecord;
 

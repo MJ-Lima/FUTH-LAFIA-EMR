@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\LabOrders\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\LabOrders\LabOrderResource;
 use Filament\Resources\Pages\CreateRecord;
 

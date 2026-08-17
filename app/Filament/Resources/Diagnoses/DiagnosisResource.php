@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\Diagnoses;
 
-use Filament\Schemas\Schema;
-
-
 use App\Filament\Resources\Diagnoses\Pages\CreateDiagnosis;
 use App\Filament\Resources\Diagnoses\Pages\EditDiagnosis;
 use App\Filament\Resources\Diagnoses\Pages\ListDiagnoses;
@@ -12,22 +9,27 @@ use App\Filament\Resources\Diagnoses\Pages\ViewDiagnosis;
 use App\Filament\Resources\Diagnoses\Schemas\DiagnosisForm;
 use App\Filament\Resources\Diagnoses\Schemas\DiagnosisInfolist;
 use App\Filament\Resources\Diagnoses\Tables\DiagnosesTable;
+use App\Filament\Traits\HasUnitScoping;
 use App\Models\Diagnosis;
 use BackedEnum;
 use Filament\Resources\Resource;
-
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class DiagnosisResource extends Resource
 {
+    use HasUnitScoping;
+
     protected static ?string $model = Diagnosis::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Clinical';
+    protected static string|\UnitEnum|null $navigationGroup = 'Clinical';
 
-    protected static ?string $recordTitleAttribute = 'description';
+    protected static ?int $navigationSort = 8;
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
     {
@@ -44,20 +46,23 @@ class DiagnosisResource extends Resource
         return DiagnosesTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => ListDiagnoses::route('/'),
+            'index'  => ListDiagnoses::route('/'),
             'create' => CreateDiagnosis::route('/create'),
-            'view' => ViewDiagnosis::route('/{record}'),
-            'edit' => EditDiagnosis::route('/{record}/edit'),
+            'view'   => ViewDiagnosis::route('/{record}'),
+            'edit'   => EditDiagnosis::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getEloquentQuery()->count());
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 }

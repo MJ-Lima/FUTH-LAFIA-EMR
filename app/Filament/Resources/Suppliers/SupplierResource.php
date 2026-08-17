@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Suppliers;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Suppliers\Pages\CreateSupplier;
 use App\Filament\Resources\Suppliers\Pages\EditSupplier;
 use App\Filament\Resources\Suppliers\Pages\ListSuppliers;
@@ -11,22 +9,27 @@ use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
 use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
+use App\Filament\Traits\HasUnitScoping;
 use App\Models\Supplier;
 use BackedEnum;
 use Filament\Resources\Resource;
-
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class SupplierResource extends Resource
 {
+    use HasUnitScoping;
+
     protected static ?string $model = Supplier::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Pharmacy';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?int $navigationSort = 8;
+
+    protected static ?string $recordTitleAttribute = 'code';
 
     public static function form(Schema $schema): Schema
     {
@@ -43,20 +46,23 @@ class SupplierResource extends Resource
         return SuppliersTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => ListSuppliers::route('/'),
+            'index'  => ListSuppliers::route('/'),
             'create' => CreateSupplier::route('/create'),
-            'view' => ViewSupplier::route('/{record}'),
-            'edit' => EditSupplier::route('/{record}/edit'),
+            'view'   => ViewSupplier::route('/{record}'),
+            'edit'   => EditSupplier::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getEloquentQuery()->count());
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 }

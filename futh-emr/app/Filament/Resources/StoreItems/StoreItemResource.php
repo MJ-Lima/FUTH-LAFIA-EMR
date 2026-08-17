@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Filament\Resources\StoreItems;
+
+use App\Filament\Resources\StoreItems\Pages\CreateStoreItem;
+use App\Filament\Resources\StoreItems\Pages\EditStoreItem;
+use App\Filament\Resources\StoreItems\Pages\ListStoreItems;
+use App\Filament\Resources\StoreItems\Pages\ViewStoreItem;
+use App\Filament\Resources\StoreItems\Schemas\StoreItemForm;
+use App\Filament\Resources\StoreItems\Schemas\StoreItemInfolist;
+use App\Filament\Resources\StoreItems\Tables\StoreItemsTable;
+use App\Filament\Traits\HasUnitScoping;
+use App\Models\StoreItem;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+
+class StoreItemResource extends Resource
+{
+    use HasUnitScoping;
+
+    protected static ?string $model = StoreItem::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Store & Inventory';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $recordTitleAttribute = 'code';
+
+    public static function form(Schema $schema): Schema
+    {
+        return StoreItemForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return StoreItemInfolist::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return StoreItemsTable::configure($table);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index'  => ListStoreItems::route('/'),
+            'create' => CreateStoreItem::route('/create'),
+            'view'   => ViewStoreItem::route('/{record}'),
+            'edit'   => EditStoreItem::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getEloquentQuery()->count());
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+}

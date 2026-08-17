@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Encounters\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Encounters\EncounterResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;

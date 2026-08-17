@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Patients\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Patients\PatientResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;

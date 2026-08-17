@@ -2,16 +2,13 @@
 
 namespace App\Filament\Resources\DrugCategories\Tables;
 
-use Filament\Schemas\Schema;
-
-use Filament\Actions\ActionGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
 
 class DrugCategoriesTable
@@ -20,38 +17,18 @@ class DrugCategoriesTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label('Name')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('code')
-                    ->label('Code')
-                    ->badge()
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('description')
-                    ->label('Description')
-                    ->limit(60)
-                    ->toggleable(),
-                IconColumn::make('status')
-                    ->label('Active')
-                    ->boolean()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('code')->label('Code')->searchable(),
+                    TextColumn::make('name')->label('Category')->searchable(),
+                    TextColumn::make('description')->label('Description')->searchable(),
+                    IconColumn::make('status')->label('Active')->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('status')
-                    ->label('Active'),
+                //
             ])
             ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                ]),
-            ])
+                ViewAction::make(),
+                EditAction::make(),
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

@@ -2,11 +2,9 @@
 
 namespace App\Filament\Resources\LabPanels\Schemas;
 
-use Filament\Schemas\Schema;
-
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-
+use Filament\Schemas\Schema;
 
 class LabPanelInfolist
 {
@@ -14,22 +12,17 @@ class LabPanelInfolist
     {
         return $schema
             ->components([
-                Section::make('Panel Information')
+                Section::make('LabPanel Information')
                     ->schema([
-                        TextEntry::make('name')->label('Panel name'),
                         TextEntry::make('code')->label('Code'),
-                        TextEntry::make('loinc_code')->label('LOINC code'),
-                        TextEntry::make('specimen_type')->label('Specimen type'),
-                        TextEntry::make('container')->label('Container'),
-                        TextEntry::make('price')->label('Price')->money('NGN'),
-                        TextEntry::make('turnaround_hours')->label('Turnaround')->suffix(' hrs'),
-                        TextEntry::make('status')
-                            ->label('Active')
-                            ->badge()
-                            ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
-                            ->color(fn ($state) => $state ? 'success' : 'gray'),
-                        TextEntry::make('description')->columnSpanFull(),
-                    ])->columns(3),
+                        TextEntry::make('name')->label('Panel'),
+                        TextEntry::make('loinc_code')->label('LOINC'),
+                        TextEntry::make('specimen_type')->label('Specimen'),
+                        TextEntry::make('price')->label('Price'),
+                        TextEntry::make('turnaround_hours')->label('TAT (hrs)'),
+                        TextEntry::make('status')->label('Active'),
+                    ])
+                    ->columns(2),
             ]);
     }
 }

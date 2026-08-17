@@ -2,16 +2,13 @@
 
 namespace App\Filament\Resources\Suppliers\Tables;
 
-use Filament\Schemas\Schema;
-
-use Filament\Actions\ActionGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
 
 class SuppliersTable
@@ -20,46 +17,20 @@ class SuppliersTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label('Name')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('code')
-                    ->label('Code')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('contact_person')
-                    ->label('Contact person')
-                    ->searchable()
-                    ->toggleable(),
-                TextColumn::make('phone')
-                    ->label('Phone')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('Email')
-                    ->toggleable(),
-                TextColumn::make('tax_id')
-                    ->label('Tax ID')
-                    ->toggleable(),
-                IconColumn::make('status')
-                    ->label('Active')
-                    ->boolean()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('code')->label('Code')->searchable(),
+                    TextColumn::make('name')->label('Supplier')->searchable(),
+                    TextColumn::make('contact_person')->label('Contact')->searchable(),
+                    TextColumn::make('phone')->label('Phone')->searchable(),
+                    TextColumn::make('email')->label('Email')->searchable(),
+                    IconColumn::make('status')->label('Active')->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('status')
-                    ->label('Active'),
+                //
             ])
             ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                ]),
-            ])
+                ViewAction::make(),
+                EditAction::make(),
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

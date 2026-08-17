@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Allergies\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\Allergies\AllergyResource;
 use Filament\Resources\Pages\CreateRecord;
 

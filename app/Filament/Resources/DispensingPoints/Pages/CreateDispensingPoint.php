@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\DispensingPoints\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\DispensingPoints\DispensingPointResource;
 use Filament\Resources\Pages\CreateRecord;
 

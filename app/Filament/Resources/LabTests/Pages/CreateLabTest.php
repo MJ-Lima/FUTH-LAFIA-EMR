@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\LabTests\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\LabTests\LabTestResource;
 use Filament\Resources\Pages\CreateRecord;
 

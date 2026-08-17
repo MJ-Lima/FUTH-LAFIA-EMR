@@ -2,20 +2,14 @@
 
 namespace App\Filament\Resources\Vitals\Tables;
 
-use Filament\Schemas\Schema;
-
-
-use Filament\Actions\ActionGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class VitalsTable
 {
@@ -23,83 +17,23 @@ class VitalsTable
     {
         return $table
             ->columns([
-                TextColumn::make('patient.full_name')
-                    ->label('Patient')
-                    ->searchable(['firstname', 'lastname'])
-                    ->sortable(),
-                TextColumn::make('patient.patientcode')
-                    ->label('Patient code')
-                    ->searchable()
-                    ->toggleable(),
-                TextColumn::make('recorded_at')
-                    ->label('Recorded at')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('temperature_c')
-                    ->label('Temp')
-                    ->suffix(' °C')
-                    ->toggleable(),
-                TextColumn::make('bp')
-                    ->label('BP')
-                    ->toggleable(),
-                TextColumn::make('heart_rate')
-                    ->label('HR')
-                    ->suffix(' bpm')
-                    ->toggleable(),
-                TextColumn::make('respiratory_rate')
-                    ->label('RR')
-                    ->suffix(' /min')
-                    ->toggleable(),
-                TextColumn::make('spo2')
-                    ->label('SpO₂')
-                    ->suffix(' %')
-                    ->toggleable(),
-                TextColumn::make('pain_score')
-                    ->label('Pain')
-                    ->toggleable(),
-                TextColumn::make('weight_kg')
-                    ->label('Weight')
-                    ->suffix(' kg')
-                    ->toggleable(),
-                TextColumn::make('height_cm')
-                    ->label('Height')
-                    ->suffix(' cm')
-                    ->toggleable(),
-                TextColumn::make('bmi')
-                    ->label('BMI')
-                    ->toggleable(),
-                TextColumn::make('blood_glucose_mmol_l')
-                    ->label('Glucose')
-                    ->suffix(' mmol/L')
-                    ->toggleable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('recorded_at')->label('Recorded At')->dateTime()->searchable(),
+                    TextColumn::make('patient.full_name')->label('Patient')->sortable(),
+                    TextColumn::make('encounter.encounter_number')->label('Encounter')->sortable(),
+                    TextColumn::make('bpLabel')->label('BP')->searchable(),
+                    TextColumn::make('heart_rate')->label('HR')->searchable(),
+                    TextColumn::make('temperature_c')->label('Temp')->searchable(),
+                    TextColumn::make('spo2')->label('SpO2')->searchable(),
+                    TextColumn::make('bmi')->label('BMI')->searchable(),
+                    TextColumn::make('recorder.name')->label('Recorded By')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('patient_id')
-                    ->label('Patient')
-                    ->relationship('patient', 'patientcode')
-                    ->searchable()
-                    ->preload(),
-                Filter::make('recorded_at')
-                    ->form([
-                        DatePicker::make('from')->label('Recorded from'),
-                        DatePicker::make('until')->label('Recorded until'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when($data['from'], fn ($q, $d) => $q->whereDate('recorded_at', '>=', $d))
-                            ->when($data['until'], fn ($q, $d) => $q->whereDate('recorded_at', '<=', $d));
-                    }),
+                //
             ])
             ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                ]),
-            ])
+                ViewAction::make(),
+                EditAction::make(),
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

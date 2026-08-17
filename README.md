@@ -1,220 +1,181 @@
-# FUTH-Lafia EMR
+# FUTH Lafia EMR — Federal University Teaching Hospital, Lafia
 
-**Federal University Teaching Hospital, Lafia — Electronic Medical Record System**
+A complete Electronic Medical Record (EMR) system built on **Laravel 12 + Filament v5 + Spatie Permission**, designed for Federal University Teaching Hospital, Lafia (Nasarawa State, Nigeria).
 
-A complete hospital information system built with **Laravel 12**, **Filament v5** (admin panel + Livewire), **Spatie Permission** (role-based access control) and **Filament Shield** (permission scaffolding). The system implements international healthcare standards including ICD-10, LOINC, ATC, DICOM modality codes and ISO 3166-2:NG (Nigerian states & LGAs).
+## Highlights
 
-## Tech Stack
+- **Green FUTH theme** (primary `#0f5132`) with the hospital logo
+- **Role-based dashboards** — every role (Super Admin, Doctor, Nurse, Pharmacist, Lab Scientist, Radiographer, Records Officer, Accountant, Insurance Officer) sees a different set of hero stats, quick actions, and the day's schedule
+- **Insurance module** — Providers, Plans, Patient Policies, Claims (with claim lines), Pre-Authorizations — modelled on NHIA / Nigerian HMO workflows
+- **Duty Posting module** — Post staff to a specific hospital + department + clinic + shift + date range. Active duty posting drives unit-based data scoping
+- **Unit-based access control** — `App\Filament\Traits\HasUnitScoping` filters every resource's Eloquent query by the logged-in user's currently-active duty posting's `hospital_id`. Super Admin / Medical Administrator bypass the filter
+- **International standards** — ICD-10 (diagnoses), LOINC (lab tests), ATC (drugs), NHIA-aligned tariffs
+- **28 Filament resources** covering Clinical, Pharmacy, Laboratory, Radiology, Insurance, Billing, and Duty Rosters
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Laravel 12 (PHP 8.2+) |
-| Admin UI | Filament v5 (Livewire 3) |
-| RBAC | spatie/laravel-permission + bezhansalleh/filament-shield |
-| Database | MySQL 8 / MariaDB 10.6+ |
-| Frontend assets | Vite, Tailwind CSS (bundled with Filament) |
+## Tech stack
 
-## Modules
+| Layer        | Tech                                              |
+|--------------|---------------------------------------------------|
+| Backend      | Laravel 12.x (PHP 8.2+)                           |
+| Admin UI     | Filament v5.x                                     |
+| Auth / RBAC  | Spatie laravel-permission + filament-shield       |
+| Database     | MySQL 8 / MariaDB 10+ (utf8mb4)                   |
+| Frontend     | Livewire v3, Tailwind CSS, Alpine.js              |
 
-The system is organized into six clinical/administrative modules covering the full patient journey:
-
-### Patient Management
-- **Patients** — demographics, next-of-kin, vital statistics, full clinical timeline
-- **Encounters** — outpatient, inpatient, emergency, telemedicine, follow-up
-- **Appointments** — scheduling, check-in, priority, cancellation tracking
-- **Clinical Notes** — SOAP-format notes (Progress, Admission, Discharge, Nursing, Procedure, Consultation, Referral, Death), signing & locking
-- **Vitals** — anthropometric, cardiovascular, respiratory, thermoregulatory, neurological, glucose, maternal
-- **Allergies** — drug/food/environmental with severity, criticality, reaction
-- **Diagnoses** — ICD-10 coded, with type (Principal/Working/Discharge/Secondary) and status (Active/Chronic/Resolved)
-
-### Laboratory
-- **Lab Panels** — bundled test panels (FBC, LFT, RFT, Lipid Profile, Urinalysis, etc.) with **LOINC** codes
-- **Lab Tests** — individual analytes with reference ranges, specimen type, container, turnaround time
-- **Lab Orders** — multi-test orders with priority (Routine/Urgent/STAT/ASAP), status workflow, results & verification
-
-### Radiology
-- **Radiology Modalities** — XRAY, US, CT, MR, FL, MG, DUS, IVR (DICOM modality codes)
-- **Radiology Orders** — examination request with clinical indication, priority, status workflow
-- **Radiology Results** — findings, impression, recommendations, image attachment, verification
-
-### Pharmacy
-- **Drug Catalog** — WHO Essential Medicines List aligned, **ATC** coded, with safety flags (controlled, antenatal-safe, paediatric-safe)
-- **Drug Batches** — batch tracking, expiry monitoring, quarantine
-- **Drug Interactions** — drug-drug interaction database with severity (Minor/Moderate/Major/Contraindicated)
-- **Suppliers** — vendor master with contact & compliance details
-- **Purchases** — local purchase orders with line items, tax, discount, payment status
-- **Receipts** — goods received notes against purchase orders
-- **Dispensing Points** — Main Pharmacy, ANC, Paediatric, Emergency, Inpatient, Theatre
-- **Prescriptions** — Rx with items, dose/route/frequency/duration, status workflow
-- **Dispensing Logs** — issue logs with batch tracking and pricing
-- **Stock Movements** — Receipt, Transfer In/Out, Dispense, Adjustment, Return, Disposal, Stock Take
-- **Stock Returns** — patient returns, expired/damaged/wrong dispense, disposition (Restocked/Quarantined/Disposed)
-
-### Administration
-- **Hospitals**, **Clinics**, **Departments**, **Staff**, **Users**, **Roles & Permissions**
-- **Medical Administration Dashboard** — overview stats (patients today, encounters, appointments, pending lab/radiology/pharmacy), encounters trend chart, encounters by visit type, appointments by status, top dispensed drugs chart
-
-## International Standards Compliance
-
-| Standard | Usage |
-|----------|-------|
-| **ICD-10** (WHO) | Diagnosis coding |
-| **LOINC** | Laboratory test identification |
-| **ATC** (WHO) | Drug classification (Anatomical Therapeutic Chemical) |
-| **DICOM** | Radiology modality codes (XRAY, CT, MR, US, etc.) |
-| **ISO 3166-2:NG** | Nigerian states & LGAs (ISO subdivision codes) |
-| **HL7 FHIR** | Conceptual model inspiration — Patient, Encounter, Observation, Condition, AllergyIntolerance, DiagnosticReport, ImagingStudy, Composition |
-| **WHO EML** | Essential Medicines List — seed drug catalog |
-
-## Installation
-
-### Prerequisites
-- PHP 8.2+ with extensions: pdo_mysql, mbstring, xml, bcmath, ctype, json, tokenizer, openssl
-- Composer 2+
-- MySQL 8 / MariaDB 10.6+
-- Node.js 18+ & npm (for frontend assets, optional — Filament ships pre-built)
-
-### Steps
-
-```bash
-# 1. Clone / extract the project
-cd futh-lafia-emr
-
-# 2. Install PHP dependencies
-composer install
-
-# 3. Install frontend dependencies (optional — Filament assets ship pre-built)
-npm install && npm run build
-
-# 4. Configure environment
-cp .env.example .env
-php artisan key:generate
-
-# 5. Edit .env — set your database credentials
-#    DB_DATABASE=fulth_emr
-#    DB_USERNAME=your_user
-#    DB_PASSWORD=your_password
-
-# 6. Import the database dump (includes schema + seed data)
-mysql -u your_user -p fulth_emr < database/fulth-emr.sql
-
-# 7. OR run migrations + seeders (alternative to step 6)
-# php artisan migrate --seed
-
-# 8. Link storage
-php artisan storage:link
-
-# 9. Serve
-php artisan serve
-# Visit http://localhost:8000/admin
-```
-
-### Default Login Credentials
-
-All seeded accounts use the password: **`password`**
-
-| Role | Email |
-|------|-------|
-| Medical Administrator | `admin@futhlafia.gov.ng` |
-| Doctor | `dr.okoro@futhlafia.gov.ng` |
-| Doctor (Obs & Gyn) | `dr.adebayo@futhlafia.gov.ng` |
-| Nurse | `nurse.john@futhlafia.gov.ng` |
-| Pharmacist | `pharm.musa@futhlafia.gov.ng` |
-| Laboratory Scientist | `lab.aisha@futhlafia.gov.ng` |
-| Radiographer | `rad.tunde@futhlafia.gov.ng` |
-| Medical Records Officer | `records.hauwa@futhlafia.gov.ng` |
-| Accountant | `accounts.david@futhlafia.gov.ng` |
-
-## Database
-
-The complete database schema + seed data is provided in `database/fulth-emr.sql` (127 KB, 49 tables, 33 INSERT statements). Import via:
-
-```bash
-mysql -u root -p -e "CREATE DATABASE fulth_emr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -u root -p fulth_emr < database/fulth-emr.sql
-```
-
-Alternatively, run Laravel migrations + seeders:
-
-```bash
-php artisan migrate --seed
-```
-
-### Key Tables
-- `users`, `staff`, `hospitals`, `departments`, `clinics`, `states`, `locals`
-- `patients`, `encounters`, `appointments`
-- `clinical_notes`, `vitals`, `allergies`, `diagnoses`
-- `lab_panels`, `lab_tests`, `lab_orders`, `lab_order_items`, `lab_results`
-- `radiology_modalities`, `radiology_orders`, `radiology_results`
-- `drug_categories`, `drugs`, `drug_batches`, `drug_interactions`
-- `suppliers`, `purchases`, `purchase_items`, `receipts`, `receipt_items`
-- `dispensing_points`, `prescriptions`, `prescription_items`
-- `dispensing_logs`, `stock_movements`, `stock_returns`
-- `permissions`, `roles`, `model_has_permissions`, `model_has_roles`, `role_has_permissions`
-
-## Roles & Permissions
-
-Nine EMR-aligned roles are seeded by default:
-
-1. **Super Admin** — all permissions
-2. **Medical Administrator** — clinical oversight + read access across modules
-3. **Doctor** — clinical workflow (patients, encounters, notes, vitals, allergies, diagnoses, lab/radiology orders, prescriptions)
-4. **Nurse** — patient care (patients, encounters, vitals, nursing notes, allergies)
-5. **Pharmacist** — full pharmacy workflow
-6. **Laboratory Scientist** — lab catalog + lab order processing
-7. **Radiographer** — radiology modalities + order processing
-8. **Medical Records Officer** — patient registration + encounter scheduling
-9. **Accountant** — read-only access to financial modules
-
-Permission generation via Filament Shield:
-
-```bash
-php artisan shield:generate --all
-php artisan shield:super-admin
-```
-
-## Project Structure
+## Project structure
 
 ```
 app/
 ├── Filament/
-│   ├── Resources/         # 30+ Filament resources organized by module
-│   │   ├── Patients/      # + 9 RelationManagers (clinical timeline)
-│   │   ├── Encounters/    # + 7 RelationManagers
-│   │   ├── Appointments/
-│   │   ├── ClinicalNotes/
-│   │   ├── Vitals/
-│   │   ├── Allergies/
-│   │   ├── Diagnoses/
-│   │   ├── LabPanels/ LabTests/ LabOrders/
-│   │   ├── RadiologyModalities/ RadiologyOrders/
-│   │   ├── DrugCategories/ Drugs/ DrugBatches/ DrugInteractions/
-│   │   ├── Suppliers/ Purchases/ Receipts/
-│   │   ├── DispensingPoints/ Prescriptions/ DispensingLogs/
-│   │   ├── StockMovements/ StockReturns/
-│   │   ├── Hospitals/ Clinics/ Departments/ Users/
-│   │   └── Each resource has: Pages/, Schemas/{Form,Infolist}, Tables/
-│   └── Widgets/           # Dashboard widgets (overview + 4 charts)
-├── Models/                # 35+ Eloquent models with relationships
-├── Policies/              # 28 policies (filament-shield compatible)
-└── Providers/
-    └── Filament/
-        └── AdminPanelProvider.php
+│   ├── Pages/Dashboard.php             # Role-based dashboard
+│   ├── Traits/HasUnitScoping.php       # Unit-based access control
+│   ├── Widgets/StatsOverviewWidget.php # KPI cards
+│   └── Resources/                      # 28 resource folders
+│       ├── Patients/      Encounters/  Appointments/
+│       ├── Vitals/        ClinicalNotes/  Allergies/  Diagnoses/
+│       ├── Staff/         DutyRosters/  DutyPostings/
+│       ├── InsuranceProviders/  InsurancePlans/  PatientInsurance/
+│       │   InsuranceClaims/  PreAuthorizations/
+│       ├── Drugs/  DrugCategories/  DrugBatches/  Prescriptions/
+│       │   DispensingPoints/  StockMovements/  Suppliers/
+│       ├── LabPanels/  LabTests/  LabOrders/
+│       ├── RadiologyModalities/  RadiologyOrders/
+│       ├── Services/  Invoices/  Payments/
+│       └── Hospitals/  Departments/  Clinics/  Users/
+├── Models/                             # 30+ Eloquent models
+└── Providers/Filament/AdminPanelProvider.php  # Green theme + branding
+
 database/
-├── migrations/            # 30+ migration files
-├── seeders/               # 10 seeder classes (international-standard data)
-└── fulth-emr.sql          # Complete database dump (schema + seed)
+├── migrations/                         # 27 migrations (existing + new)
+└── seeders/
+    ├── FuthPermissionsSeeder.php       # Role → permission matrix
+    └── FuthEmrSeeder.php               # NHIA providers, plans, policies, services, duty postings
 ```
 
-## Security
+## Installation (production deployment)
 
-- All passwords are bcrypt-hashed (Laravel default)
-- Role-based access control via Spatie Permission
-- Per-resource policies (view/create/update/delete/restore/force-delete)
-- Authentication required for all admin routes
-- CSRF protection on all forms
-- Audit-ready: every clinical record tracks `created_by`, `updated_at`, soft-deletes where appropriate
+```bash
+# 1. Clone & install dependencies
+composer install --optimize-autoloader --no-dev
+
+# 2. Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# 3. Edit .env — set DB_CONNECTION=mysql, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+
+# 4. Run migrations + seeders
+php artisan migrate --force
+php artisan db:seed --force
+
+# 5. Configure web server (Nginx/Apache) — document root = public/
+#    Or use `php artisan serve` for development
+
+# 6. Create storage symlink
+php artisan storage:link
+```
+
+## Default credentials
+
+| Email                                  | Password     | Role                      |
+|----------------------------------------|--------------|---------------------------|
+| admin@futhlafia.gov.ng                 | Futh@2026    | Super Admin               |
+| dr.okoro@futhlafia.gov.ng              | Futh@2026    | Doctor                    |
+| dr.adebayo@futhlafia.gov.ng            | Futh@2026    | Doctor (OBGYN)            |
+| nurse.john@futhlafia.gov.ng            | Futh@2026    | Nurse                     |
+| pharm.musa@futhlafia.gov.ng            | Futh@2026    | Pharmacist                |
+| lab.aisha@futhlafia.gov.ng             | Futh@2026    | Laboratory Scientist      |
+| rad.tunde@futhlafia.gov.ng             | Futh@2026    | Radiographer              |
+| records.hauwa@futhlafia.gov.ng         | Futh@2026    | Medical Records Officer   |
+| accounts.david@futhlafia.gov.ng        | Futh@2026    | Accountant                |
+| insurance.officer@futhlafia.gov.ng     | Futh@2026    | Insurance Officer         |
+
+**URL:** `http://<your-server>/admin/login`
+
+## Modules overview
+
+### Clinical
+- **Patients** — demographics, next-of-kin, insurance, with auto-generated patient codes (`FUTH-LF-YYYY-NNNNNN`)
+- **Encounters** — Outpatient / Emergency / Inpatient / Telemedicine / Follow-up visits
+- **Appointments** — booking, scheduling, check-in, no-show tracking
+- **Vitals** — full vital signs (BP, HR, RR, SpO₂, Temp, BMI, GCS, blood glucose, fetal HR, MUAC)
+- **Clinical Notes** — SOAP-format (Subjective / Objective / Assessment / Plan)
+- **Allergies** — drug / food / environment, with severity and reaction tracking
+- **Diagnoses** — ICD-10 coded, with type (Principal / Working / Discharge) and status
+
+### Duty & Staff Posting
+- **Duty Rosters** — weekly / monthly cycles
+- **Duty Postings** — assign staff to a hospital + department + clinic + shift + date range with role-in-unit (In-Charge / Supervisor / Officer / Assistant / Trainee). Active postings drive the unit-based data scoping
+
+### Insurance (NEW)
+- **Insurance Providers** — NHIA, HMOs, Private insurers (Hygeia, AXA Mansard, Reliance, Greenbay seeded)
+- **Insurance Plans** — tier (Formal / Informal / Equity / Vulnerable / Premium / Standard / VIP), benefit limits, copay, coverage flags (pharmacy / lab / radiology / inpatient / maternity / dental / optical)
+- **Patient Insurance** — policy enrolment, principal relationship, verification workflow, benefit utilisation tracking
+- **Insurance Claims** — submission lifecycle (Draft → Submitted → Acknowledged → Processing → Approved / Partially Approved / Rejected → Paid / Reversed) with claim line items per service
+- **Pre-Authorizations** — request pre-approval for high-cost services before delivery
+
+### Pharmacy
+- **Drugs** — full catalog with ATC codes, cost/selling prices, reorder levels, controlled/antenatal/pediatric flags
+- **Drug Categories / Drug Batches** — batch tracking with expiry, quarantine, stock balance
+- **Prescriptions** — prescriber → dispensing point workflow with priority (Routine / Urgent / STAT)
+- **Dispensing Points** — pharmacy sub-locations
+- **Stock Movements** — full audit trail (Receipt / Transfer / Dispense / Adjustment / Return / Disposal / Stock Take)
+- **Suppliers** — vendor management
+
+### Laboratory
+- **Lab Panels** (LOINC-coded) — grouped test panels with specimen type and turnaround time
+- **Lab Tests** (LOINC-coded) — individual tests with reference ranges
+- **Lab Orders** — order lifecycle (Pending → Sample Collected → In Progress → Completed → Verified / Cancelled / Rejected) with priority (Routine / Urgent / STAT / ASAP)
+
+### Radiology
+- **Modalities** (X-Ray, US, CT, MRI, etc.) with NHIA-aligned pricing
+- **Radiology Orders** — examination, body part, clinical indication, priority, full lifecycle
+
+### Billing & Finance
+- **Services** — chargeable services with NHIA / private / standard rates
+- **Invoices** — invoice lifecycle (Draft → Pending → Partially Paid → Paid / Overdue / Cancelled / Refunded), supports Cash / Insurance / NHIA / Corporate / Charity / Mixed modes
+- **Payments** — multiple payment methods (Cash / Card / Bank Transfer / Cheque / Mobile Money / POS / Insurance / Online), auto-updates invoice balances
+
+## Unit-based access control — how it works
+
+The `App\Filament\Traits\HasUnitScoping` trait overrides `getEloquentQuery()` on every resource. When a non-admin user logs in:
+
+1. The system looks up their currently **Active** `DutyPosting` (where `start_date <= today` and `end_date >= today`)
+2. All Filament queries are filtered by `hospital_id` matching that posting
+3. Super Admin and Medical Administrator bypass the filter and see all hospitals
+
+To reassign a staff member to a different unit:
+1. Open **Duty Postings** → Create
+2. Select the staff member, hospital, department, clinic, shift, and date range
+3. Set status to **Active** — this automatically marks their previous active posting as Completed
+4. From that moment, all data the staff member sees is scoped to the new unit
+
+## International standards compliance
+
+| Standard | Where used                                           |
+|----------|------------------------------------------------------|
+| ICD-10   | `diagnoses.icd10_code`                               |
+| LOINC    | `lab_panels.loinc_code`, `lab_tests.loinc_code`     |
+| ATC      | `drugs.atc_code`                                     |
+| SNOMED CT| `allergies.code` (optional)                          |
+| ISO 3166 | `patients.country`, states & LGAs (Nigerian seeded)  |
+| NHIA     | Insurance provider type, plan tiers, service tariffs|
+
+## Local development (this sandbox)
+
+A self-contained PHP 8.4 + MariaDB 11.8 runtime is installed under `/home/z/php-local/`. To start the EMR:
+
+```bash
+# Start MariaDB (if not running)
+/home/z/php-local/start.sh
+
+# Start Laravel dev server
+cd /home/z/my-project/futh-emr
+/home/z/php-local/bin/php-wrapper artisan serve --host=127.0.0.1 --port=8000
+```
+
+Then open `http://127.0.0.1:8000/admin/login` and log in with `admin@futhlafia.gov.ng / Futh@2026`.
 
 ## License
 
-This project is licensed for use by Federal University Teaching Hospital, Lafia. The underlying Laravel framework is MIT-licensed.
+Internal use — Federal University Teaching Hospital, Lafia.

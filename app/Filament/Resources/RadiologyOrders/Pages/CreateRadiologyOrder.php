@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\RadiologyOrders\Pages;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\RadiologyOrders\RadiologyOrderResource;
 use Filament\Resources\Pages\CreateRecord;
 

@@ -10,26 +10,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Clinic extends Model
 {
     use SoftDeletes;
-	
-	protected $fillable = [
-        'hospital_id',
-        'name',
-        'code',
-        'status',
-    ];
 
-    public function hospital(): BelongsTo
+    protected $fillable = ['hospital_id', 'name', 'code', 'status'];
+
+    protected function casts(): array
     {
-        return $this->belongsTo(Hospital::class);
+        return ['status' => 'boolean'];
     }
 
-    public function staff(): HasMany
-    {
-        return $this->hasMany(Staff::class);
-    }
-
-    public function visits(): HasMany
-    {
-        return $this->hasMany(Visit::class);
-    }
+    public function hospital(): BelongsTo { return $this->belongsTo(Hospital::class); }
+    public function encounters(): HasMany { return $this->hasMany(Encounter::class); }
+    public function appointments(): HasMany { return $this->hasMany(Appointment::class); }
+    public function staff(): HasMany { return $this->hasMany(Staff::class); }
+    public function dutyPostings(): HasMany { return $this->hasMany(DutyPosting::class); }
 }

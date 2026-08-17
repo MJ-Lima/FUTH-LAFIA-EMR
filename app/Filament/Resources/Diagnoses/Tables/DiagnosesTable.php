@@ -1,15 +1,14 @@
 <?php
 
 namespace App\Filament\Resources\Diagnoses\Tables;
-use Filament\Schemas\Schema;
 
-use Filament\Actions\ActionGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
 
 class DiagnosesTable
@@ -18,33 +17,21 @@ class DiagnosesTable
     {
         return $table
             ->columns([
-                TextColumn::make('patient.full_name')->label('Patient')->searchable()->sortable(),
-                TextColumn::make('patient.patientcode')->label('Code')->toggleable(),
-                TextColumn::make('icd10_code')->label('ICD-10')->searchable()->sortable(),
-                TextColumn::make('description')->limit(60)->searchable(),
-                TextColumn::make('type')->badge(),
-                TextColumn::make('status')->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Active' => 'danger',
-                        'Chronic' => 'warning',
-                        'Recurrent' => 'warning',
-                        'Resolved' => 'success',
-                        default => 'gray',
-                    }),
-                TextColumn::make('onset_date')->date(),
-                TextColumn::make('resolved_date')->date()->toggleable(),
-                TextColumn::make('recorder.name')->label('By')->toggleable(),
+                    TextColumn::make('patient.full_name')->label('Patient')->sortable(),
+                    TextColumn::make('icd10_code')->label('ICD-10')->searchable(),
+                    TextColumn::make('description')->label('Description')->searchable(),
+                    TextColumn::make('type')->label('Type')->badge()->color('success')->searchable(),
+                    TextColumn::make('status')->label('Status')->badge()->color('success')->searchable(),
+                    TextColumn::make('onset_date')->label('Onset')->date()->searchable(),
+                    TextColumn::make('recorder.name')->label('Recorded By')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('type'),
-                SelectFilter::make('status'),
+                //
             ])
             ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                ]),
-            ])
+                ViewAction::make(),
+                EditAction::make(),
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

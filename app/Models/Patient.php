@@ -5,67 +5,86 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class Patient extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'patientcode', 'hospital_id',
-        'firstname', 'middlename', 'lastname',
-        'dob', 'gender', 'bloodgroup', 'genotype', 'marital',
-        'religion', 'occupation',
-        'phonemain', 'phonealt', 'email',
-        'address', 'city', 'state', 'country', 'postalcode',
-        'nokname', 'relationship', 'nokphone', 'nokaddress',
-        'hereabout', 'notes', 'status',
+        'patientcode', 'patient_type', 'hospital_id', 'firstname', 'middlename', 'lastname', 'dob',
+        'gender', 'bloodgroup', 'genotype', 'marital', 'religion', 'occupation',
+        'phonemain', 'phonealt', 'email', 'address', 'city', 'state', 'country',
+        'postalcode', 'nokname', 'nok_firstname', 'nok_middlename', 'relationship', 'nokphone', 'nokaddress',
+        'hereabout', 'notes', 'status', 'photo_path', 'thumbprint_path', 'thumbprint_data', 'biometric_captured_at', 'biometric_captured_by', 'verification_status', 'verified_at', 'verified_by', 'national_id', 'national_id_type',
     ];
 
-    protected $casts = [
-        'dob' => 'date',
-        'status' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'dob'     => 'date',
+            'status'  => 'boolean',
+        'biometric_captured_at' => 'datetime',
+        'verified_at' => 'datetime',
+        ];
+    }
 
-    protected static function booted(): void
+    protected static function booted()
     {
         static::creating(function ($patient) {
             if (empty($patient->hospital_id) && Auth::check()) {
                 $patient->hospital_id = Auth::user()->hospital_id;
             }
-
             $hospital = Hospital::find($patient->hospital_id);
-            $prefix = $hospital?->code ?? 'HSP';
-            $year = now()->year;
-            $lastPatient = self::where('hospital_id', $patient->hospital_id)
+            $prefix   = $hospital?->code ?? 'FUTH';
+            $year     = now()->year;
+
+            $lastPatient = self::withTrashed()
+                ->where('hospital_id', $patient->hospital_id)
                 ->whereYear('created_at', $year)
-                ->latest('id')->first();
-            $next = $lastPatient ? ((int) substr($lastPatient->patientcode, -6)) + 1 : 1;
+                ->latest('id')
+                ->first();
+
+            $next = $lastPatient
+                ? ((int) substr($lastPatient->patientcode, -6)) + 1
+                : 1;
+
             $patient->patientcode = sprintf('%s-%s-%06d', $prefix, $year, $next);
         });
     }
 
+    /* ---- Relations ---- */
     public function hospital(): BelongsTo { return $this->belongsTo(Hospital::class); }
-
     public function encounters(): HasMany { return $this->hasMany(Encounter::class); }
     public function appointments(): HasMany { return $this->hasMany(Appointment::class); }
-    public function clinicalNotes(): HasMany { return $this->hasMany(ClinicalNote::class); }
     public function vitals(): HasMany { return $this->hasMany(Vitals::class); }
+    public function clinicalNotes(): HasMany { return $this->hasMany(ClinicalNote::class); }
     public function allergies(): HasMany { return $this->hasMany(Allergy::class); }
     public function diagnoses(): HasMany { return $this->hasMany(Diagnosis::class); }
+    public function prescriptions(): HasMany { return $this->hasMany(Prescription::class); }
     public function labOrders(): HasMany { return $this->hasMany(LabOrder::class); }
     public function radiologyOrders(): HasMany { return $this->hasMany(RadiologyOrder::class); }
-    public function prescriptions(): HasMany { return $this->hasMany(Prescription::class); }
-    public function dispensingLogs(): HasMany { return $this->hasMany(DispensingLog::class); }
+    public function insurancePolicies(): HasMany { return $this->hasMany(PatientInsurance::class); }
+    public function insuranceClaims(): HasMany { return $this->hasMany(InsuranceClaim::class); }
+    public function preAuthorizations(): HasMany { return $this->hasMany(PreAuthorization::class); }
+    public function invoices(): HasMany { return $this->hasMany(Invoice::class); }
+    public function payments(): HasMany { return $this->hasMany(Payment::class); }
+    public function dependants(): HasMany { return $this->hasMany(PatientDependant::class, 'principal_patient_id'); }
+    public function relationships(): HasMany { return $this->hasMany(PatientRelationship::class); }
+    public function biometricCapturer(): BelongsTo { return $this->belongsTo(User::class, 'biometric_captured_by'); }
+    public function verifier(): BelongsTo { return $this->belongsTo(User::class, 'verified_by'); }
+    public function isVerified(): bool { return $this->verification_status === 'Verified'; }
+    public function verify(?int $verifierId = null): void { $this->update(['verification_status' => 'Verified', 'verified_at' => now(), 'verified_by' => $verifierId ?? Auth::id()]); }
 
-    public function getFullNameAttribute(): string
+    /* ---- Helpers ---- */
+    public function fullName(): string
     {
         return trim("{$this->firstname} {$this->middlename} {$this->lastname}");
     }
 
-    public function getAgeAttribute(): ?string
+    public function age(): int
     {
-        if (! $this->dob) {
-            return null;
-        }
-        return $this->dob->age . ' yrs';
+        return $this->dob?->age ?? 0;
     }
 }

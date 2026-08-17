@@ -2,12 +2,10 @@
 
 namespace App\Filament\Resources\Suppliers\Schemas;
 
+use Filament\Forms\Components\Select, TextInput, Textarea, Toggle;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 
 class SupplierForm
 {
@@ -15,48 +13,21 @@ class SupplierForm
     {
         return $schema
             ->components([
-                Section::make('Supplier Information')
+                Section::make('Supplier Details')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Name')
-                            ->required()
-                            ->maxLength(150),
-                        TextInput::make('code')
-                            ->label('Code')
-                            ->maxLength(32),
-                        TextInput::make('contact_person')
-                            ->label('Contact person')
-                            ->maxLength(120),
-                        TextInput::make('phone')
-                            ->label('Phone')
-                            ->tel()
-                            ->maxLength(32),
-                        TextInput::make('email')
-                            ->label('Email')
-                            ->email()
-                            ->maxLength(120),
-                    ])->columns(2),
-
-                Section::make('Address & Compliance')
-                    ->schema([
-                        Textarea::make('address')
-                            ->label('Address')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        TextInput::make('tax_id')
-                            ->label('Tax ID')
-                            ->maxLength(64),
-                        TextInput::make('registration_number')
-                            ->label('Registration number')
-                            ->maxLength(64),
-                    ])->columns(2),
-
-                Section::make('Status')
-                    ->schema([
-                        Toggle::make('status')
-                            ->label('Active')
-                            ->default(true),
-                    ])->columns(1),
+                        Grid::make(2)->schema([
+                            Select::make('hospital_id')->label('Hospital')->required()->relationship('hospital', 'name')->searchable()->preload(),
+                            TextInput::make('name')->label('Supplier Name')->required(),
+                            TextInput::make('code')->label('Code')->required(),
+                            TextInput::make('contact_person')->label('Contact Person'),
+                            TextInput::make('phone')->label('Phone')->tel(),
+                            TextInput::make('email')->label('Email')->email(),
+                            Textarea::make('address')->label('Address'),
+                            TextInput::make('tax_id')->label('Tax ID'),
+                            TextInput::make('registration_number')->label('Registration #'),
+                            Toggle::make('status')->label('Active'),
+                        ]),
+                    ]),
             ]);
     }
 }

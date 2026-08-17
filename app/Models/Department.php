@@ -3,26 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Department extends Model
 {
     use SoftDeletes;
-	
-	protected $fillable = [
-        'hospital_id',
-        'name',
-        'code',
-        'description',
-		'status'
-    ];
 
-    public function hospital()
+    protected $fillable = ['hospital_id', 'name', 'code', 'description', 'status'];
+
+    protected function casts(): array
     {
-        return $this->belongsTo(Hospital::class);
+        return ['status' => 'boolean'];
     }
 
-    public function user()
-    {
-        return $this->hasMany(User::class);
-    }
+    public function hospital(): BelongsTo { return $this->belongsTo(Hospital::class); }
+    public function staff(): HasMany { return $this->hasMany(Staff::class); }
+    public function clinics(): HasMany { return $this->hasMany(Clinic::class); }
+    public function dutyPostings(): HasMany { return $this->hasMany(DutyPosting::class); }
 }

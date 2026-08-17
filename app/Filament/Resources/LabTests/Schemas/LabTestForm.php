@@ -2,15 +2,10 @@
 
 namespace App\Filament\Resources\LabTests\Schemas;
 
+use Filament\Forms\Components\Select, TextInput, Textarea, Toggle;
 use Filament\Schemas\Schema;
-
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
-use Illuminate\Support\Facades\Auth;
 
 class LabTestForm
 {
@@ -18,87 +13,26 @@ class LabTestForm
     {
         return $schema
             ->components([
-                Section::make('Test Information')
+                Section::make('LabTest Details')
                     ->schema([
-                        TextInput::make('hospital_id')
-                            ->hidden()
-                            ->default(fn () => Auth::user()?->hospital_id)
-                            ->dehydrated(),
-                        Select::make('lab_panel_id')
-                            ->label('Lab panel')
-                            ->relationship('panel', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->nullable(),
-                        TextInput::make('name')
-                            ->label('Test name')
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('code')
-                            ->label('Test code')
-                            ->required()
-                            ->maxLength(64)
-                            ->unique('lab_tests', 'code', ignoreRecord: true)
-                            ->helperText('Must be unique across all lab tests.'),
-                        TextInput::make('loinc_code')
-                            ->label('LOINC code')
-                            ->maxLength(64),
-                    ])->columns(2),
-
-                Section::make('Specimen & Container')
-                    ->schema([
-                        TextInput::make('specimen_type')
-                            ->label('Specimen type')
-                            ->maxLength(120),
-                        TextInput::make('container')
-                            ->label('Container')
-                            ->maxLength(120),
-                        TextInput::make('unit')
-                            ->label('Reporting unit')
-                            ->maxLength(64),
-                    ])->columns(3),
-
-                Section::make('Reference Range')
-                    ->schema([
-                        TextInput::make('reference_range_low')
-                            ->label('Lower bound')
-                            ->numeric()
-                            ->step(0.0001),
-                        TextInput::make('reference_range_high')
-                            ->label('Upper bound')
-                            ->numeric()
-                            ->step(0.0001),
-                        Textarea::make('reference_notes')
-                            ->label('Reference notes')
-                            ->rows(2)
-                            ->columnSpanFull(),
-                    ])->columns(2),
-
-                Section::make('Pricing & Turnaround')
-                    ->schema([
-                        TextInput::make('price')
-                            ->label('Price')
-                            ->numeric()
-                            ->default(0)
-                            ->minValue(0)
-                            ->step(0.01),
-                        TextInput::make('turnaround_hours')
-                            ->label('Turnaround (hours)')
-                            ->numeric()
-                            ->default(24)
-                            ->minValue(0),
-                        Toggle::make('status')
-                            ->label('Active')
-                            ->default(true),
-                    ])->columns(3),
-
-                Section::make('Description')
-                    ->schema([
-                        Textarea::make('description')
-                            ->label('Description')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ])->columns(1),
+                        Grid::make(2)->schema([
+                            Select::make('hospital_id')->label('Hospital')->required()->relationship('hospital', 'name')->searchable()->preload(),
+                            Select::make('lab_panel_id')->label('Panel')->relationship('panel', 'name')->searchable()->preload(),
+                            TextInput::make('name')->label('Test Name')->required(),
+                            TextInput::make('code')->label('Code')->required(),
+                            TextInput::make('loinc_code')->label('LOINC Code'),
+                            TextInput::make('specimen_type')->label('Specimen Type'),
+                            TextInput::make('container')->label('Container'),
+                            TextInput::make('unit')->label('Unit'),
+                            TextInput::make('reference_range_low')->label('Ref Low')->numeric(),
+                            TextInput::make('reference_range_high')->label('Ref High')->numeric(),
+                            TextInput::make('reference_notes')->label('Ref Notes'),
+                            Textarea::make('description')->label('Description'),
+                            TextInput::make('price')->label('Price')->numeric(),
+                            TextInput::make('turnaround_hours')->label('Turnaround (hrs)')->numeric(),
+                            Toggle::make('status')->label('Active'),
+                        ]),
+                    ]),
             ]);
     }
 }

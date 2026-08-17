@@ -3,54 +3,40 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Staff extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'user_id',
-        'hospital_id',
-        'department_id',
-        'clinic_id',
-        'staff_number',
-        'title',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'gender',
-        'date_of_birth',
-        'phone',
-        'address',
-        'designation',
-        'staff_type',
-        'signature',
-        'passport',
-        'status'
+        'user_id', 'hospital_id', 'department_id', 'clinic_id', 'staff_number',
+        'title', 'first_name', 'middle_name', 'last_name', 'gender', 'date_of_birth',
+        'phone', 'address', 'designation', 'staff_type', 'passport', 'signature',
+        'status',
     ];
 
-    public function user()
+    protected function casts(): array
     {
-        return $this->belongsTo(User::class);
+        return [
+            'date_of_birth' => 'date',
+            'status'        => 'boolean',
+        ];
     }
 
-    public function hospital()
+    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function hospital(): BelongsTo { return $this->belongsTo(Hospital::class); }
+    public function department(): BelongsTo { return $this->belongsTo(Department::class); }
+    public function clinic(): BelongsTo { return $this->belongsTo(Clinic::class); }
+
+    public function dutyPostings()
     {
-        return $this->belongsTo(Hospital::class);
+        return $this->hasMany(DutyPosting::class);
     }
 
-    public function department()
+    public function fullName(): string
     {
-        return $this->belongsTo(Department::class);
-    }
-
-    public function clinic()
-    {
-        return $this->belongsTo(Clinic::class);
-    }
-
-    public function getFullNameAttribute()
-    {
-        return trim(
-            "{$this->title} {$this->first_name} {$this->middle_name} {$this->last_name}"
-        );
+        return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
     }
 }

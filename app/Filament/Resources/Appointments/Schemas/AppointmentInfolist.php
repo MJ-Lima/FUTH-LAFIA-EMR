@@ -2,11 +2,9 @@
 
 namespace App\Filament\Resources\Appointments\Schemas;
 
-use Filament\Schemas\Schema;
-
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-
+use Filament\Schemas\Schema;
 
 class AppointmentInfolist
 {
@@ -14,22 +12,18 @@ class AppointmentInfolist
     {
         return $schema
             ->components([
-                Section::make('Appointment')
+                Section::make('Appointment Information')
                     ->schema([
-                        TextEntry::make('appointment_number')->label('Appointment #'),
+                        TextEntry::make('appointment_number')->label('Appt #'),
                         TextEntry::make('patient.full_name')->label('Patient'),
-                        TextEntry::make('patient.patientcode')->label('Patient code'),
                         TextEntry::make('clinic.name')->label('Clinic'),
                         TextEntry::make('provider.name')->label('Provider'),
-                        TextEntry::make('appointment_date')->date(),
-                        TextEntry::make('appointment_time')->time(),
-                        TextEntry::make('estimated_duration')->suffix(' min'),
-                        TextEntry::make('visit_type')->badge(),
-                        TextEntry::make('priority')->badge(),
-                        TextEntry::make('status')->badge(),
-                        TextEntry::make('reason_for_visit')->columnSpanFull(),
-                        TextEntry::make('notes')->columnSpanFull(),
-                    ])->columns(3),
+                        TextEntry::make('appointment_date')->label('Date')->date(),
+                        TextEntry::make('appointment_time')->label('Time'),
+                        TextEntry::make('visit_type')->label('Type'),
+                        TextEntry::make('priority')->label('Priority'),
+                    ])
+                    ->columns(2),
             ]);
     }
 }

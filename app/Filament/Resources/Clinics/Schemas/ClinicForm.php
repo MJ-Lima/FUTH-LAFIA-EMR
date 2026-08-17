@@ -2,12 +2,10 @@
 
 namespace App\Filament\Resources\Clinics\Schemas;
 
-use Filament\Schemas\Schema;
-
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-
+use Filament\Schemas\Schema;
 
 class ClinicForm
 {

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Filament\Resources\Hospitals\Pages;
-use Filament\Schemas\Schema;
 
 use App\Filament\Resources\Hospitals\HospitalResource;
 use Filament\Actions\CreateAction;

@@ -2,13 +2,10 @@
 
 namespace App\Filament\Resources\LabPanels\Schemas;
 
+use Filament\Forms\Components\Select, TextInput, Textarea, Toggle;
 use Filament\Schemas\Schema;
-
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 
 class LabPanelForm
 {
@@ -16,46 +13,21 @@ class LabPanelForm
     {
         return $schema
             ->components([
-                Section::make('Panel Information')
+                Section::make('LabPanel Details')
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Panel name')
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('code')
-                            ->label('Panel code')
-                            ->required()
-                            ->maxLength(64)
-                            ->unique('lab_panels', 'code', ignoreRecord: true)
-                            ->helperText('Must be unique across all lab panels.'),
-                        TextInput::make('loinc_code')
-                            ->label('LOINC code')
-                            ->maxLength(64),
-                        TextInput::make('specimen_type')
-                            ->label('Specimen type')
-                            ->maxLength(120),
-                        TextInput::make('container')
-                            ->label('Container')
-                            ->maxLength(120),
-                        Textarea::make('description')
-                            ->label('Description')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        TextInput::make('price')
-                            ->label('Price')
-                            ->numeric()
-                            ->default(0)
-                            ->minValue(0)
-                            ->step(0.01),
-                        TextInput::make('turnaround_hours')
-                            ->label('Turnaround (hours)')
-                            ->numeric()
-                            ->default(24)
-                            ->minValue(0),
-                        Toggle::make('status')
-                            ->label('Active')
-                            ->default(true),
-                    ])->columns(2),
+                        Grid::make(2)->schema([
+                            Select::make('hospital_id')->label('Hospital')->required()->relationship('hospital', 'name')->searchable()->preload(),
+                            TextInput::make('name')->label('Panel Name')->required(),
+                            TextInput::make('code')->label('Code')->required(),
+                            TextInput::make('loinc_code')->label('LOINC Code'),
+                            TextInput::make('specimen_type')->label('Specimen Type'),
+                            TextInput::make('container')->label('Container'),
+                            Textarea::make('description')->label('Description'),
+                            TextInput::make('price')->label('Price')->numeric(),
+                            TextInput::make('turnaround_hours')->label('Turnaround (hrs)')->numeric(),
+                            Toggle::make('status')->label('Active'),
+                        ]),
+                    ]),
             ]);
     }
 }

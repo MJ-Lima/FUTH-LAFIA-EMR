@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\DrugCategories;
 
-use Filament\Schemas\Schema;
-
 use App\Filament\Resources\DrugCategories\Pages\CreateDrugCategory;
 use App\Filament\Resources\DrugCategories\Pages\EditDrugCategory;
 use App\Filament\Resources\DrugCategories\Pages\ListDrugCategories;
@@ -11,22 +9,27 @@ use App\Filament\Resources\DrugCategories\Pages\ViewDrugCategory;
 use App\Filament\Resources\DrugCategories\Schemas\DrugCategoryForm;
 use App\Filament\Resources\DrugCategories\Schemas\DrugCategoryInfolist;
 use App\Filament\Resources\DrugCategories\Tables\DrugCategoriesTable;
+use App\Filament\Traits\HasUnitScoping;
 use App\Models\DrugCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
-
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class DrugCategoryResource extends Resource
 {
+    use HasUnitScoping;
+
     protected static ?string $model = DrugCategory::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Pharmacy';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
 
-    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'code';
 
     public static function form(Schema $schema): Schema
     {
@@ -43,20 +46,23 @@ class DrugCategoryResource extends Resource
         return DrugCategoriesTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
-            'index' => ListDrugCategories::route('/'),
+            'index'  => ListDrugCategories::route('/'),
             'create' => CreateDrugCategory::route('/create'),
-            'view' => ViewDrugCategory::route('/{record}'),
-            'edit' => EditDrugCategory::route('/{record}/edit'),
+            'view'   => ViewDrugCategory::route('/{record}'),
+            'edit'   => EditDrugCategory::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return number_format(static::getEloquentQuery()->count());
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 }

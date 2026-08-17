@@ -1,16 +1,14 @@
 <?php
 
 namespace App\Filament\Resources\RadiologyModalities\Tables;
-use Filament\Schemas\Schema;
 
-use Filament\Actions\ActionGroup;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
 
 class RadiologyModalitiesTable
@@ -19,39 +17,19 @@ class RadiologyModalitiesTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')
-                    ->label('Modality')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('code')
-                    ->label('Code')
-                    ->badge()
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('price')
-                    ->label('Price')
-                    ->money('NGN')
-                    ->sortable(),
-                TextColumn::make('turnaround_hours')
-                    ->label('Turnaround')
-                    ->suffix(' hrs')
-                    ->sortable(),
-                IconColumn::make('status')
-                    ->label('Active')
-                    ->boolean(),
+                    TextColumn::make('code')->label('Code')->searchable(),
+                    TextColumn::make('name')->label('Modality')->searchable(),
+                    TextColumn::make('price')->label('Price')->searchable(),
+                    TextColumn::make('turnaround_hours')->label('TAT')->searchable(),
+                    IconColumn::make('status')->label('Active')->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('status')
-                    ->label('Active')
-                    ->trueLabel('Active only')
-                    ->falseLabel('Inactive only'),
+                //
             ])
             ->recordActions([
-                ActionGroup::make([
-                    ViewAction::make(),
-                    EditAction::make(),
-                ]),
-            ])
+                ViewAction::make(),
+                EditAction::make(),
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
