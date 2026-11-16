@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Invoices\Schemas;
 
-use Filament\Forms\Components\DatePicker, Select, TextInput, Textarea;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class InvoiceForm
 {
     public static function configure(Schema $schema): Schema
@@ -16,7 +19,7 @@ class InvoiceForm
                 Section::make('Invoice Details')
                     ->schema([
                         Grid::make(2)->schema([
-                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('encounter_id')->label('Encounter')->relationship('encounter', 'encounter_number')->searchable()->preload(),
                             Select::make('patient_insurance_id')->label('Insurance Policy')->relationship('policy', 'policy_number')->searchable()->preload(),
                             Select::make('payment_mode')->label('Payment Mode')->required()->options(['Cash' => 'Cash', 'Insurance' => 'Insurance', 'NHIA' => 'NHIA', 'Corporate' => 'Corporate', 'Charity' => 'Charity', 'Mixed' => 'Mixed'])->searchable(),

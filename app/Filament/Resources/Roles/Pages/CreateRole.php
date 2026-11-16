@@ -1,48 +1,41 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Filament\Resources\Roles\Pages;
 
 use App\Filament\Resources\Roles\RoleResource;
-use BezhanSalleh\FilamentShield\Support\Utils;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Override;
+use Spatie\Permission\PermissionRegistrar;
 
 class CreateRole extends CreateRecord
 {
-    public Collection $permissions;
-
     protected static string $resource = RoleResource::class;
 
-    #[Override]
+    protected ?array $pendingPermissions = null;
+
+    /**
+     * Pull 'permissions' out of the form data before Filament saves.
+     * The field is marked ->dehydrated(false) in RoleResource::form(),
+     * so without this hook the value would be discarded.
+     */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->permissions = collect($data)
-            ->filter(fn (mixed $permission, string $key): bool => ! in_array($key, ['name', 'guard_name', 'select_all', Utils::getTenantModelForeignKey()], true))
-            ->values()
-            ->flatten()
-            ->unique();
+        $this->pendingPermissions = $data['permissions'] ?? null;
+        unset($data['permissions']);
 
-        if (Utils::isTenancyEnabled() && Arr::has($data, Utils::getTenantModelForeignKey()) && filled($data[Utils::getTenantModelForeignKey()])) {
-            return Arr::only($data, ['name', 'guard_name', Utils::getTenantModelForeignKey()]);
-        }
-
-        return Arr::only($data, ['name', 'guard_name']);
+        return $data;
     }
 
     protected function afterCreate(): void
     {
-        $permissionModels = collect();
-        $this->permissions->each(function (string $permission) use ($permissionModels): void {
-            $permissionModels->push(Utils::getPermissionModel()::firstOrCreate([
-                'name' => $permission,
-                'guard_name' => $this->data['guard_name'],
-            ]));
-        });
+        $role = $this->record;
 
-        $this->record->syncPermissions($permissionModels);
+        if ($this->pendingPermissions !== null && !empty($this->pendingPermissions)) {
+            // givePermissionTo() accepts an array of permission names and properly
+            // clears the cache after attaching each one.
+            $role->givePermissionTo($this->pendingPermissions);
+
+            // Belt-and-suspenders: explicitly clear the cache.
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
+        }
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\StockMovements;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\StockMovements\Pages\CreateStockMovement;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\StockMovements\Pages\EditStockMovement;
 use App\Filament\Resources\StockMovements\Pages\ListStockMovements;
 use App\Filament\Resources\StockMovements\Pages\ViewStockMovement;
 use App\Filament\Resources\StockMovements\Schemas\StockMovementForm;
 use App\Filament\Resources\StockMovements\Schemas\StockMovementInfolist;
 use App\Filament\Resources\StockMovements\Tables\StockMovementsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\StockMovement;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class StockMovementResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedArrowsRightLeft;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Pharmacy';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 7;
+    }
     protected static ?string $model = StockMovement::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
-
-    protected static ?int $navigationSort = 7;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class StockMovementResource extends Resource
             'view'   => ViewStockMovement::route('/{record}'),
             'edit'   => EditStockMovement::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

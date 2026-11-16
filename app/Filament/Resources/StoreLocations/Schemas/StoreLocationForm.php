@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\StoreLocations\Schemas;
 
-use Filament\Forms\Components\Select, TextInput, Toggle;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class StoreLocationForm
 {
     public static function configure(Schema $schema): Schema

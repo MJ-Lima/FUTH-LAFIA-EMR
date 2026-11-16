@@ -47,4 +47,15 @@ class Drug extends Model
     {
         return $this->totalStock() <= (float) $this->reorder_level;
     }
+
+    // Snake-case aliases used by the dispensing workflow
+    public function getStockQtyAttribute(): float
+    {
+        return $this->totalStock();
+    }
+
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->isLowStock();
+    }
 }

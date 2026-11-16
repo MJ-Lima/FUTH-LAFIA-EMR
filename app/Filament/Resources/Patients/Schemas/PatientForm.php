@@ -2,18 +2,16 @@
 
 namespace App\Filament\Resources\Patients\Schemas;
 
+
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Wizard;
-use Filament\Schemas\Components\Wizard\Step;
-use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
 use App\Models\State;
 use App\Models\Local;
 
@@ -188,23 +186,28 @@ class PatientForm
                                 ->default('Nigeria')
                                 ->required(),
 
-                            Select::make('state')
-                                ->label('State')
-                                ->options(fn () => State::pluck('name', 'name')->toArray())
-                                ->searchable()
-                                ->reactive()
-                                ->afterStateUpdated(fn ($state, $set) => $set('city', null)),
+                    Select::make('state')
+                    ->label('State')
+                        ->options(fn () => State::pluck('name', 'name')->toArray())
+                             ->searchable()
+                             ->live()
+                            ->afterStateUpdated(fn ($state, $set) => $set('lga', null)),
 
-                            Select::make('lga')
-                                ->label('LGA')
-                                ->options(function ($get) {
-                                    $stateName = $get('state');
-                                    if (!$stateName) return [];
-                                    $state = State::where('name', $stateName)->first();
-                                    if (!$state) return [];
-                                    return Local::where('state_id', $state->state_id)->pluck('local_name', 'local_name')->toArray();
-                                })
-                                ->searchable(),
+                    Select::make('lga')
+                             ->label('LGA')
+                            ->options(function (callable $get) {
+                                $stateName = $get('state');
+                                if (!$stateName) return [];
+                                $state = State::where('name', $stateName)->first();
+                                if (!$state) return [];
+                        // Strip 'NG-' prefix from state code (states.code='NG-AB', lgas.STATE_CODE='AB')
+                                $stateCode = str_replace('NG-', '', $state->code);
+                                    return \DB::table('lgas')
+                            ->where('STATE_CODE', $stateCode)
+                            ->pluck('NAME', 'NAME')
+                            ->toArray();
+                                    })
+                        ->searchable(),
 
                             TextInput::make('city')
                                 ->label('City')

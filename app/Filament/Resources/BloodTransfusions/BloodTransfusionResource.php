@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\BloodTransfusions;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\BloodTransfusions\Pages\CreateBloodTransfusion;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\BloodTransfusions\Pages\EditBloodTransfusion;
 use App\Filament\Resources\BloodTransfusions\Pages\ListBloodTransfusions;
 use App\Filament\Resources\BloodTransfusions\Pages\ViewBloodTransfusion;
 use App\Filament\Resources\BloodTransfusions\Schemas\BloodTransfusionForm;
 use App\Filament\Resources\BloodTransfusions\Schemas\BloodTransfusionInfolist;
 use App\Filament\Resources\BloodTransfusions\Tables\BloodTransfusionsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\BloodTransfusion;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BloodTransfusionResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedHeart;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Blood Bank';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
+    }
     protected static ?string $model = BloodTransfusion::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Blood Bank';
-
-    protected static ?int $navigationSort = 6;
 
     protected static ?string $recordTitleAttribute = 'transfusion_number';
 
@@ -54,15 +63,5 @@ class BloodTransfusionResource extends Resource
             'view'   => ViewBloodTransfusion::route('/{record}'),
             'edit'   => EditBloodTransfusion::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\InternalAudits;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\InternalAudits\Pages\CreateInternalAudit;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\InternalAudits\Pages\EditInternalAudit;
 use App\Filament\Resources\InternalAudits\Pages\ListInternalAudits;
 use App\Filament\Resources\InternalAudits\Pages\ViewInternalAudit;
 use App\Filament\Resources\InternalAudits\Schemas\InternalAuditForm;
 use App\Filament\Resources\InternalAudits\Schemas\InternalAuditInfolist;
 use App\Filament\Resources\InternalAudits\Tables\InternalAuditsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\InternalAudit;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class InternalAuditResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedShieldCheck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Audit';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
     protected static ?string $model = InternalAudit::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Audit';
-
-    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'audit_number';
 
@@ -54,15 +63,5 @@ class InternalAuditResource extends Resource
             'view'   => ViewInternalAudit::route('/{record}'),
             'edit'   => EditInternalAudit::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

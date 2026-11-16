@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ProviderSchedules;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ProviderSchedules\Pages\CreateProviderSchedule;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ProviderSchedules\Pages\EditProviderSchedule;
 use App\Filament\Resources\ProviderSchedules\Pages\ListProviderSchedules;
 use App\Filament\Resources\ProviderSchedules\Pages\ViewProviderSchedule;
 use App\Filament\Resources\ProviderSchedules\Schemas\ProviderScheduleForm;
 use App\Filament\Resources\ProviderSchedules\Schemas\ProviderScheduleInfolist;
 use App\Filament\Resources\ProviderSchedules\Tables\ProviderSchedulesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ProviderSchedule;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ProviderScheduleResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedUserGroup;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Schedule Configuration';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = ProviderSchedule::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Schedule Configuration';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class ProviderScheduleResource extends Resource
             'view'   => ViewProviderSchedule::route('/{record}'),
             'edit'   => EditProviderSchedule::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

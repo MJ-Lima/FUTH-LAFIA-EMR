@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\DispensingPoint;
 use App\Models\Hospital;
 use Illuminate\Database\Seeder;
+use App\Models\Supplier;
 
 class SupplierSeeder extends Seeder
 {

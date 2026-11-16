@@ -41,19 +41,20 @@ class StaffSeeder extends Seeder
                 ]
             );
 
+            // Map staff_type (Title Case, matches enum) to snake_case role name
             $roleMap = [
-                'Administrator' => 'Medical Administrator',
-                'Doctor' => 'Doctor',
-                'Nurse' => 'Nurse',
-                'Pharmacist' => 'Pharmacist',
-                'Laboratory Scientist' => 'Laboratory Scientist',
-                'Radiographer' => 'Radiographer',
-                'Medical Records' => 'Medical Records Officer',
-                'Accountant' => 'Accountant',
+                'Administrator'         => 'medical_administrator',
+                'Doctor'                => 'doctor',
+                'Nurse'                 => 'nurse',
+                'Pharmacist'            => 'pharmacist',
+                'Laboratory Scientist'  => 'laboratory_scientist',
+                'Radiographer'          => 'radiographer',
+                'Medical Records'       => 'medical_records_officer',
+                'Accountant'            => 'accountant',
             ];
 
-            if (! $user->hasRole($roleMap[$staffType] ?? 'Doctor')) {
-                $user->assignRole($roleMap[$staffType] ?? 'Doctor');
+            if (! $user->hasRole($roleMap[$staffType] ?? 'doctor')) {
+                $user->assignRole($roleMap[$staffType] ?? 'doctor');
             }
 
             $department = Department::where('hospital_id', $hospital->id)

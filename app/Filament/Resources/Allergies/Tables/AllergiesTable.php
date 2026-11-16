@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Allergies\Tables;
 
+use Filament\Tables\Columns\IconColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;

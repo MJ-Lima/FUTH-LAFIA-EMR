@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Beds;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Beds\Pages\CreateBed;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Beds\Pages\EditBed;
 use App\Filament\Resources\Beds\Pages\ListBeds;
 use App\Filament\Resources\Beds\Pages\ViewBed;
 use App\Filament\Resources\Beds\Schemas\BedForm;
 use App\Filament\Resources\Beds\Schemas\BedInfolist;
 use App\Filament\Resources\Beds\Tables\BedsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Bed;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BedResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Ward & Bed Management';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = Bed::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Ward & Bed Management';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'bed_number';
 
@@ -54,15 +63,5 @@ class BedResource extends Resource
             'view'   => ViewBed::route('/{record}'),
             'edit'   => EditBed::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

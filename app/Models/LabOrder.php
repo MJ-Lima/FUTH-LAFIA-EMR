@@ -14,8 +14,36 @@ class LabOrder extends Model
 
     protected $fillable = [
         'hospital_id', 'patient_id', 'encounter_id', 'requested_by', 'received_by',
+        'destination_lab_id',
         'order_number', 'ordered_at', 'collected_at', 'resulted_at', 'priority',
         'status', 'clinical_notes', 'specimen_source', 'fasting_status',
+    ];
+
+    public const STATUSES = [
+        'Pending' => 'Pending',
+        'Sample Collected' => 'Sample Collected',
+        'In Progress' => 'In Progress',
+        'Completed' => 'Completed',
+        'Verified' => 'Verified',
+        'Cancelled' => 'Cancelled',
+        'Rejected' => 'Rejected',
+    ];
+
+    public const STATUS_COLORS = [
+        'Pending' => 'warning',
+        'Sample Collected' => 'info',
+        'In Progress' => 'info',
+        'Completed' => 'success',
+        'Verified' => 'success',
+        'Cancelled' => 'danger',
+        'Rejected' => 'danger',
+    ];
+
+    public const PRIORITIES = [
+        'Routine' => 'Routine',
+        'Urgent' => 'Urgent',
+        'STAT' => 'STAT',
+        'ASAP' => 'ASAP',
     ];
 
     protected function casts(): array
@@ -46,5 +74,7 @@ class LabOrder extends Model
     public function encounter(): BelongsTo { return $this->belongsTo(Encounter::class); }
     public function requester(): BelongsTo { return $this->belongsTo(User::class, 'requested_by'); }
     public function receiver(): BelongsTo { return $this->belongsTo(User::class, 'received_by'); }
+    public function destinationLab(): BelongsTo { return $this->belongsTo(Laboratory::class, 'destination_lab_id'); }
     public function items(): HasMany { return $this->hasMany(LabOrderItem::class); }
+    public function transfers(): HasMany { return $this->hasMany(LabTransfer::class); }
 }

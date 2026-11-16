@@ -11,19 +11,11 @@ class EditPatient extends EditRecord
 {
     protected static string $resource = PatientResource::class;
 
-    public static function canEdit($record): bool
-    {
-        return auth()->user()?->can('update patient') ?? false;
-    }
-
     protected function getHeaderActions(): array
     {
-        $actions = [ViewAction::make()];
-
-        if (auth()->user()?->can('delete patient')) {
-            $actions[] = DeleteAction::make();
-        }
-
-        return $actions;
+        return [
+            ViewAction::make(),
+            DeleteAction::make(),
+        ];
     }
 }

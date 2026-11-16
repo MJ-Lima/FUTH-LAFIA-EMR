@@ -9,6 +9,7 @@ use App\Filament\Resources\Admissions\Pages\ViewAdmission;
 use App\Filament\Resources\Admissions\Schemas\AdmissionForm;
 use App\Filament\Resources\Admissions\Schemas\AdmissionInfolist;
 use App\Filament\Resources\Admissions\Tables\AdmissionsTable;
+use App\Filament\Traits\HasRoleBasedAccess;
 use App\Filament\Traits\HasUnitScoping;
 use App\Models\Admission;
 use BackedEnum;
@@ -19,16 +20,25 @@ use Filament\Tables\Table;
 
 class AdmissionResource extends Resource
 {
+    use HasRoleBasedAccess;
     use HasUnitScoping;
 
+    public static function getNavigationIcon(): Heroicon
+{
+    return Heroicon::OutlinedClipboardDocumentCheck;
+}
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Ward & Bed Management';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
+
     protected static ?string $model = Admission::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Ward & Bed Management';
-
-    protected static ?int $navigationSort = 3;
-
     protected static ?string $recordTitleAttribute = 'admission_number';
 
     public static function form(Schema $schema): Schema
@@ -54,15 +64,5 @@ class AdmissionResource extends Resource
             'view'   => ViewAdmission::route('/{record}'),
             'edit'   => EditAdmission::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

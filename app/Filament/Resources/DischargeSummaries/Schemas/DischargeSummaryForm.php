@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\DischargeSummaries\Schemas;
 
-use Filament\Forms\Components\DatePicker, DateTimePicker, Select, Textarea, TimePicker;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class DischargeSummaryForm
 {
     public static function configure(Schema $schema): Schema
@@ -17,7 +21,7 @@ class DischargeSummaryForm
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('admission_id')->label('Admission')->required()->relationship('admission', 'admission_number')->searchable()->preload(),
-                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('discharging_doctor_id')->label('Discharging Doctor')->required()->relationship('discharging_doctor', 'name')->searchable()->preload(),
                             DateTimePicker::make('discharge_date')->label('Discharge Date')->required(),
                             Select::make('discharge_type')->label('Discharge Type')->required()->options(['Improved' => 'Improved', 'Recovered' => 'Recovered', 'Refused Treatment' => 'Refused Treatment', 'Absconded' => 'Absconded', 'Transferred' => 'Transferred', 'Death' => 'Death', 'AMA' => 'AMA', 'Other' => 'Other'])->searchable(),

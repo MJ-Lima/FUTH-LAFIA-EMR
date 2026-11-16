@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\JournalLines;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\JournalLines\Pages\CreateJournalLine;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\JournalLines\Pages\EditJournalLine;
 use App\Filament\Resources\JournalLines\Pages\ListJournalLines;
 use App\Filament\Resources\JournalLines\Pages\ViewJournalLine;
 use App\Filament\Resources\JournalLines\Schemas\JournalLineForm;
 use App\Filament\Resources\JournalLines\Schemas\JournalLineInfolist;
 use App\Filament\Resources\JournalLines\Tables\JournalLinesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\JournalLine;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class JournalLineResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedBars3;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Accounting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = JournalLine::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Accounting';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class JournalLineResource extends Resource
             'view'   => ViewJournalLine::route('/{record}'),
             'edit'   => EditJournalLine::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\Payments\Schemas;
 
-use Filament\Forms\Components\DateTimePicker, Select, TextInput, Textarea;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class PaymentForm
 {
     public static function configure(Schema $schema): Schema
@@ -16,7 +19,7 @@ class PaymentForm
                 Section::make('Payment Details')
                     ->schema([
                         Grid::make(2)->schema([
-                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('invoice_id')->label('Invoice')->relationship('invoice', 'invoice_number')->searchable()->preload(),
                             Select::make('insurance_claim_id')->label('Insurance Claim')->relationship('claim', 'claim_number')->searchable()->preload(),
                             Select::make('payer_type')->label('Payer Type')->required()->options(['Patient' => 'Patient', 'Insurance' => 'Insurance', 'NHIA' => 'NHIA', 'Corporate' => 'Corporate', 'Government' => 'Government', 'Other' => 'Other'])->searchable(),

@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\PatientInsurance\Schemas;
 
-use Filament\Forms\Components\DatePicker, Select, TextInput, Textarea, Toggle;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class PatientInsuranceForm
 {
     public static function configure(Schema $schema): Schema
@@ -16,7 +20,7 @@ class PatientInsuranceForm
                 Section::make('PatientInsurance Details')
                     ->schema([
                         Grid::make(2)->schema([
-                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('insurance_provider_id')->label('Provider')->required()->relationship('provider', 'name')->searchable()->preload(),
                             Select::make('insurance_plan_id')->label('Plan')->required()->relationship('plan', 'name')->searchable()->preload(),
                             TextInput::make('policy_number')->label('Policy Number')->required(),

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\JournalEntries;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\JournalEntries\Pages\CreateJournalEntry;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\JournalEntries\Pages\EditJournalEntry;
 use App\Filament\Resources\JournalEntries\Pages\ListJournalEntries;
 use App\Filament\Resources\JournalEntries\Pages\ViewJournalEntry;
 use App\Filament\Resources\JournalEntries\Schemas\JournalEntryForm;
 use App\Filament\Resources\JournalEntries\Schemas\JournalEntryInfolist;
 use App\Filament\Resources\JournalEntries\Tables\JournalEntriesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\JournalEntry;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class JournalEntryResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedBookOpen;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Accounting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = JournalEntry::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Accounting';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'entry_number';
 
@@ -54,15 +63,5 @@ class JournalEntryResource extends Resource
             'view'   => ViewJournalEntry::route('/{record}'),
             'edit'   => EditJournalEntry::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ReportSchedules;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ReportSchedules\Pages\CreateReportSchedule;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ReportSchedules\Pages\EditReportSchedule;
 use App\Filament\Resources\ReportSchedules\Pages\ListReportSchedules;
 use App\Filament\Resources\ReportSchedules\Pages\ViewReportSchedule;
 use App\Filament\Resources\ReportSchedules\Schemas\ReportScheduleForm;
 use App\Filament\Resources\ReportSchedules\Schemas\ReportScheduleInfolist;
 use App\Filament\Resources\ReportSchedules\Tables\ReportSchedulesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ReportSchedule;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ReportScheduleResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCalendarDays;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Reports';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = ReportSchedule::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Reports';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class ReportScheduleResource extends Resource
             'view'   => ViewReportSchedule::route('/{record}'),
             'edit'   => EditReportSchedule::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

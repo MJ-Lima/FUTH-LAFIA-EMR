@@ -11,22 +11,32 @@ class DutyPosting extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        'duty_roster_id', 'hospital_id', 'user_id', 'staff_id',
-        'department_id', 'clinic_id',
-        'start_date', 'end_date', 'shift', 'shift_start', 'shift_end',
-        'role_in_unit', 'notes', 'status', 'posted_by',
-    ];
+   protected $fillable = [
+    'duty_roster_id', 'hospital_id', 'user_id', 'staff_id',
+    'department_id', 'clinic_id',
+    'start_date', 'end_date', 'shift', 'shift_start', 'shift_end',
+    'role_in_unit', 'notes', 'status', 'posted_by',
+    // Cashier shift enforcement fields:
+    'shift_start_time', 'shift_end_time',
+    'is_cashier_shift', 'is_active_now',
+    'last_login_at', 'force_logout_at',
+];
 
-    protected function casts(): array
-    {
-        return [
-            'start_date'  => 'date',
-            'end_date'    => 'date',
-            'shift_start' => 'datetime',
-            'shift_end'   => 'datetime',
-        ];
-    }
+protected function casts(): array
+{
+    return [
+        'start_date'  => 'date',
+        'end_date'    => 'date',
+        'shift_start' => 'datetime',
+        'shift_end'   => 'datetime',
+        'shift_start_time' => 'datetime:H:i:s',
+        'shift_end_time'   => 'datetime:H:i:s',
+        'is_cashier_shift' => 'boolean',
+        'is_active_now'     => 'boolean',
+        'last_login_at'     => 'datetime',
+        'force_logout_at'   => 'datetime',
+    ];
+}
 
     protected static function booted()
     {

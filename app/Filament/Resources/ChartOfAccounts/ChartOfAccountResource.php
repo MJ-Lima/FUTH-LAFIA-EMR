@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ChartOfAccounts;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ChartOfAccounts\Pages\CreateChartOfAccount;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ChartOfAccounts\Pages\EditChartOfAccount;
 use App\Filament\Resources\ChartOfAccounts\Pages\ListChartOfAccounts;
 use App\Filament\Resources\ChartOfAccounts\Pages\ViewChartOfAccount;
 use App\Filament\Resources\ChartOfAccounts\Schemas\ChartOfAccountForm;
 use App\Filament\Resources\ChartOfAccounts\Schemas\ChartOfAccountInfolist;
 use App\Filament\Resources\ChartOfAccounts\Tables\ChartOfAccountsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ChartOfAccount;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ChartOfAccountResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedChartBar;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Accounting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = ChartOfAccount::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Accounting';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'account_code';
 
@@ -54,15 +63,5 @@ class ChartOfAccountResource extends Resource
             'view'   => ViewChartOfAccount::route('/{record}'),
             'edit'   => EditChartOfAccount::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

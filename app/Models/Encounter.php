@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
@@ -62,4 +63,22 @@ class Encounter extends Model
     public function radiologyOrders(): HasMany { return $this->hasMany(RadiologyOrder::class); }
     public function invoices(): HasMany { return $this->hasMany(Invoice::class); }
     public function insuranceClaims(): HasMany { return $this->hasMany(InsuranceClaim::class); }
+
+    // — Clinic-specific consultation workflow —
+    public function presentingComplaints(): BelongsToMany
+    {
+        return $this->belongsToMany(PresentingComplaint::class, 'encounter_presenting_complaints')
+            ->withPivot(['duration', 'description'])
+            ->withTimestamps();
+    }
+
+    public function consultationNotes(): HasMany
+    {
+        return $this->hasMany(ConsultationNote::class);
+    }
+
+    public function residentAdmissionNotes(): HasMany
+    {
+        return $this->hasMany(ResidentAdmissionNote::class);
+    }
 }

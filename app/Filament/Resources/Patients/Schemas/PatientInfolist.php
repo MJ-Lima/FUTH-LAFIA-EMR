@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\Patients\Schemas;
 
+
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
-
 class PatientInfolist
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextEntry::make('patientcode'),
+                TextEntry::make('hospital_no'),
                 TextEntry::make('firstname'),
                 TextEntry::make('middlename'),
                 TextEntry::make('lastname'),
@@ -37,7 +37,7 @@ class PatientInfolist
                 TextEntry::make('address')
                     ->columnSpanFull(),
                 TextEntry::make('city'),
-                TextEntry::make('state'),
+                TextEntry::make('states'),
                 TextEntry::make('country'),
                 TextEntry::make('postalcode')
                     ->placeholder('-'),

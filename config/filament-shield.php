@@ -119,8 +119,8 @@ return [
     'permissions' => [
         'separator' => ':',
         'case' => 'pascal',
-        'generate' => true,
-        'format_custom_permission_keys' => true,
+        'generate' => false,
+        'format_custom_permission_keys' => false,
     ],
 
     /*
@@ -141,7 +141,7 @@ return [
     'policies' => [
         'path' => app_path('Policies'),
         'merge' => true,
-        'generate' => true,
+        'generate' => false,
         'methods' => [
             'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny', 'restore',
             'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
@@ -282,6 +282,6 @@ return [
     |
     */
 
-    'register_role_policy' => true,
+    'register_role_policy' => false,
 
 ];

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\AuditCategories;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\AuditCategories\Pages\CreateAuditCategory;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\AuditCategories\Pages\EditAuditCategory;
 use App\Filament\Resources\AuditCategories\Pages\ListAuditCategories;
 use App\Filament\Resources\AuditCategories\Pages\ViewAuditCategory;
 use App\Filament\Resources\AuditCategories\Schemas\AuditCategoryForm;
 use App\Filament\Resources\AuditCategories\Schemas\AuditCategoryInfolist;
 use App\Filament\Resources\AuditCategories\Tables\AuditCategoriesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\AuditCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class AuditCategoryResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedSwatch;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Audit';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = AuditCategory::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSwatch;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Audit';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class AuditCategoryResource extends Resource
             'view'   => ViewAuditCategory::route('/{record}'),
             'edit'   => EditAuditCategory::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

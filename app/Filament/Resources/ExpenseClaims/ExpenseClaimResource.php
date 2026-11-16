@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ExpenseClaims;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ExpenseClaims\Pages\CreateExpenseClaim;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ExpenseClaims\Pages\EditExpenseClaim;
 use App\Filament\Resources\ExpenseClaims\Pages\ListExpenseClaims;
 use App\Filament\Resources\ExpenseClaims\Pages\ViewExpenseClaim;
 use App\Filament\Resources\ExpenseClaims\Schemas\ExpenseClaimForm;
 use App\Filament\Resources\ExpenseClaims\Schemas\ExpenseClaimInfolist;
 use App\Filament\Resources\ExpenseClaims\Tables\ExpenseClaimsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ExpenseClaim;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ExpenseClaimResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedDocumentCurrencyDollar;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Accounting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = ExpenseClaim::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentCurrencyDollar;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Accounting';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'claim_number';
 
@@ -54,15 +63,5 @@ class ExpenseClaimResource extends Resource
             'view'   => ViewExpenseClaim::route('/{record}'),
             'edit'   => EditExpenseClaim::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

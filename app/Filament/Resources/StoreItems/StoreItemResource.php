@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\StoreItems;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\StoreItems\Pages\CreateStoreItem;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\StoreItems\Pages\EditStoreItem;
 use App\Filament\Resources\StoreItems\Pages\ListStoreItems;
 use App\Filament\Resources\StoreItems\Pages\ViewStoreItem;
 use App\Filament\Resources\StoreItems\Schemas\StoreItemForm;
 use App\Filament\Resources\StoreItems\Schemas\StoreItemInfolist;
 use App\Filament\Resources\StoreItems\Tables\StoreItemsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\StoreItem;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class StoreItemResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCube;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Store & Inventory';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = StoreItem::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Store & Inventory';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class StoreItemResource extends Resource
             'view'   => ViewStoreItem::route('/{record}'),
             'edit'   => EditStoreItem::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

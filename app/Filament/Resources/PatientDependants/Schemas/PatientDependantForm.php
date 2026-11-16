@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\PatientDependants\Schemas;
 
-use Filament\Forms\Components\DatePicker, Select, TextInput, Textarea;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class PatientDependantForm
 {
     public static function configure(Schema $schema): Schema
@@ -17,7 +20,7 @@ class PatientDependantForm
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('principal_patient_id')->label('Principal Patient')->required()->relationship('principal_patient', 'full_name')->searchable()->preload(),
-                            Select::make('patient_id')->label('Patient Record (if registered)')->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient Record (if registered)')->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('patient_insurance_id')->label('Insurance Policy')->relationship('patient_insurance', 'policy_number')->searchable()->preload(),
                             TextInput::make('first_name')->label('First Name')->required(),
                             TextInput::make('middle_name')->label('Middle Name'),

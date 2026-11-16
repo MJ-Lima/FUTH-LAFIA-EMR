@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\DutyPostings;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\DutyPostings\Pages\CreateDutyPosting;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\DutyPostings\Pages\EditDutyPosting;
 use App\Filament\Resources\DutyPostings\Pages\ListDutyPostings;
 use App\Filament\Resources\DutyPostings\Pages\ViewDutyPosting;
 use App\Filament\Resources\DutyPostings\Schemas\DutyPostingForm;
 use App\Filament\Resources\DutyPostings\Schemas\DutyPostingInfolist;
 use App\Filament\Resources\DutyPostings\Tables\DutyPostingsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\DutyPosting;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class DutyPostingResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedClipboardDocumentCheck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Duty & Staff Posting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
     protected static ?string $model = DutyPosting::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Duty & Staff Posting';
-
-    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class DutyPostingResource extends Resource
             'view'   => ViewDutyPosting::route('/{record}'),
             'edit'   => EditDutyPosting::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

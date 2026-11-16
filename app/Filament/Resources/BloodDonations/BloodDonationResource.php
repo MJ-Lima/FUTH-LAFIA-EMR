@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\BloodDonations;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\BloodDonations\Pages\CreateBloodDonation;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\BloodDonations\Pages\EditBloodDonation;
 use App\Filament\Resources\BloodDonations\Pages\ListBloodDonations;
 use App\Filament\Resources\BloodDonations\Pages\ViewBloodDonation;
 use App\Filament\Resources\BloodDonations\Schemas\BloodDonationForm;
 use App\Filament\Resources\BloodDonations\Schemas\BloodDonationInfolist;
 use App\Filament\Resources\BloodDonations\Tables\BloodDonationsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\BloodDonation;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BloodDonationResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedBeaker;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Blood Bank';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = BloodDonation::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Blood Bank';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'donation_number';
 
@@ -54,15 +63,5 @@ class BloodDonationResource extends Resource
             'view'   => ViewBloodDonation::route('/{record}'),
             'edit'   => EditBloodDonation::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

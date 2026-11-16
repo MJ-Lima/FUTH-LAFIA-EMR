@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\StoreCategories;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\StoreCategories\Pages\CreateStoreCategory;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\StoreCategories\Pages\EditStoreCategory;
 use App\Filament\Resources\StoreCategories\Pages\ListStoreCategories;
 use App\Filament\Resources\StoreCategories\Pages\ViewStoreCategory;
 use App\Filament\Resources\StoreCategories\Schemas\StoreCategoryForm;
 use App\Filament\Resources\StoreCategories\Schemas\StoreCategoryInfolist;
 use App\Filament\Resources\StoreCategories\Tables\StoreCategoriesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\StoreCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class StoreCategoryResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedTag;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Store & Inventory';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = StoreCategory::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Store & Inventory';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class StoreCategoryResource extends Resource
             'view'   => ViewStoreCategory::route('/{record}'),
             'edit'   => EditStoreCategory::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

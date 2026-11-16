@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\Encounters\Schemas;
 
+
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TimePicker;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Auth;
-
 
 class EncounterForm
 {
@@ -19,7 +19,7 @@ class EncounterForm
         return $schema
             ->components([
 			Select::make('patient_id')
-					->relationship(name: 'patient', titleAttribute: 'patientcode')
+					->relationship(name: 'patient', titleAttribute: 'hospital_no')
 					->searchable() 
 					->preload(),
             

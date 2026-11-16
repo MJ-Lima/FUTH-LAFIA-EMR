@@ -19,7 +19,7 @@ class ViewUser extends ViewRecord
 			->url(UserResource::getUrl('index'))
 			->color('success')
 			->icon('heroicon-o-arrow-left'),
-            EditAction::make(),
+            EditAction::make()->visible(true),
         ];
     }
 }

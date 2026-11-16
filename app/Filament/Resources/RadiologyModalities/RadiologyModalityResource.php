@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\RadiologyModalities;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\RadiologyModalities\Pages\CreateRadiologyModality;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\RadiologyModalities\Pages\EditRadiologyModality;
 use App\Filament\Resources\RadiologyModalities\Pages\ListRadiologyModalities;
 use App\Filament\Resources\RadiologyModalities\Pages\ViewRadiologyModality;
 use App\Filament\Resources\RadiologyModalities\Schemas\RadiologyModalityForm;
 use App\Filament\Resources\RadiologyModalities\Schemas\RadiologyModalityInfolist;
 use App\Filament\Resources\RadiologyModalities\Tables\RadiologyModalitiesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\RadiologyModality;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class RadiologyModalityResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCamera;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Radiology';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = RadiologyModality::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCamera;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Radiology';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class RadiologyModalityResource extends Resource
             'view'   => ViewRadiologyModality::route('/{record}'),
             'edit'   => EditRadiologyModality::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

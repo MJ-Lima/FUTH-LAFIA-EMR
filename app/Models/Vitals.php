@@ -51,9 +51,9 @@ class Vitals extends Model
     public function encounter(): BelongsTo { return $this->belongsTo(Encounter::class); }
     public function recorder(): BelongsTo { return $this->belongsTo(User::class, 'recorded_by'); }
 
-    public function bpLabel(): string
-    {
-        if (!$this->systolic_bp || !$this->diastolic_bp) return '—';
+   public function getBpLabelAttribute(): string
+{
+    return "{$this->systolic}/{$this->diastolic}";
         return "{$this->systolic_bp}/{$this->diastolic_bp} mmHg";
     }
 

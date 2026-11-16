@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\AppointmentTypes;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\AppointmentTypes\Pages\CreateAppointmentType;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\AppointmentTypes\Pages\EditAppointmentType;
 use App\Filament\Resources\AppointmentTypes\Pages\ListAppointmentTypes;
 use App\Filament\Resources\AppointmentTypes\Pages\ViewAppointmentType;
 use App\Filament\Resources\AppointmentTypes\Schemas\AppointmentTypeForm;
 use App\Filament\Resources\AppointmentTypes\Schemas\AppointmentTypeInfolist;
 use App\Filament\Resources\AppointmentTypes\Tables\AppointmentTypesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\AppointmentType;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class AppointmentTypeResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedSwatch;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Schedule Configuration';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = AppointmentType::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSwatch;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Schedule Configuration';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class AppointmentTypeResource extends Resource
             'view'   => ViewAppointmentType::route('/{record}'),
             'edit'   => EditAppointmentType::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

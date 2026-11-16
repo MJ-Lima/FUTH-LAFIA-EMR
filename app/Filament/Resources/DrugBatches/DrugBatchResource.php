@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\DrugBatches;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\DrugBatches\Pages\CreateDrugBatch;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\DrugBatches\Pages\EditDrugBatch;
 use App\Filament\Resources\DrugBatches\Pages\ListDrugBatches;
 use App\Filament\Resources\DrugBatches\Pages\ViewDrugBatch;
 use App\Filament\Resources\DrugBatches\Schemas\DrugBatchForm;
 use App\Filament\Resources\DrugBatches\Schemas\DrugBatchInfolist;
 use App\Filament\Resources\DrugBatches\Tables\DrugBatchesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\DrugBatch;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class DrugBatchResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCubeTransparent;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Pharmacy';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = DrugBatch::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCubeTransparent;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'batch_number';
 
@@ -54,15 +63,5 @@ class DrugBatchResource extends Resource
             'view'   => ViewDrugBatch::route('/{record}'),
             'edit'   => EditDrugBatch::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

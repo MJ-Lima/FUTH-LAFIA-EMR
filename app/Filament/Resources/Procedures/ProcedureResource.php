@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Procedures;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Procedures\Pages\CreateProcedure;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Procedures\Pages\EditProcedure;
 use App\Filament\Resources\Procedures\Pages\ListProcedures;
 use App\Filament\Resources\Procedures\Pages\ViewProcedure;
 use App\Filament\Resources\Procedures\Schemas\ProcedureForm;
 use App\Filament\Resources\Procedures\Schemas\ProcedureInfolist;
 use App\Filament\Resources\Procedures\Tables\ProceduresTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Procedure;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ProcedureResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCog6Tooth;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Procedures';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = Procedure::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Procedures';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class ProcedureResource extends Resource
             'view'   => ViewProcedure::route('/{record}'),
             'edit'   => EditProcedure::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

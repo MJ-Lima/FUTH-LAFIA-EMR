@@ -34,7 +34,7 @@ class StatsOverviewWidget extends BaseWidget
             Stat::make('Pending Prescriptions', Prescription::where('status', 'Pending')->count())
                 ->description('Awaiting dispensing')
                 ->color('success')
-                ->icon('heroicon-o-prescription'),
+                ->icon('heroicon-o-clipboard-document'),
 
             Stat::make('Open Insurance Claims', InsuranceClaim::whereNotIn('status', ['Paid', 'Rejected', 'Reversed'])->count())
                 ->description('In submission / processing')

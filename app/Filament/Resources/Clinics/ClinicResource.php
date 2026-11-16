@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Clinics;
 
+use App\Filament\Traits\HasRoleBasedAccess;
 use App\Filament\Resources\Clinics\Pages\CreateClinic;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Clinics\Pages\EditClinic;
 use App\Filament\Resources\Clinics\Pages\ListClinics;
 use App\Filament\Resources\Clinics\Pages\ViewClinic;
@@ -18,9 +20,13 @@ use Filament\Tables\Table;
 
 class ClinicResource extends Resource
 {
-    protected static ?string $model = Clinic::class;
+    use HasRoleBasedAccess;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
+    protected static ?string $model = Clinic::class;
 
     public static function form(Schema $schema): Schema
     {

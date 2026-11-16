@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ServiceCategories;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ServiceCategories\Pages\CreateServiceCategory;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ServiceCategories\Pages\EditServiceCategory;
 use App\Filament\Resources\ServiceCategories\Pages\ListServiceCategories;
 use App\Filament\Resources\ServiceCategories\Pages\ViewServiceCategory;
 use App\Filament\Resources\ServiceCategories\Schemas\ServiceCategoryForm;
 use App\Filament\Resources\ServiceCategories\Schemas\ServiceCategoryInfolist;
 use App\Filament\Resources\ServiceCategories\Tables\ServiceCategoriesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ServiceCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ServiceCategoryResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedSwatch;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Billing & Finance';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 0;
+    }
     protected static ?string $model = ServiceCategory::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSwatch;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Billing & Finance';
-
-    protected static ?int $navigationSort = 0;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class ServiceCategoryResource extends Resource
             'view'   => ViewServiceCategory::route('/{record}'),
             'edit'   => EditServiceCategory::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

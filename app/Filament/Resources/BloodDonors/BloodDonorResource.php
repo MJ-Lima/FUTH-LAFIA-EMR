@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\BloodDonors;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\BloodDonors\Pages\CreateBloodDonor;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\BloodDonors\Pages\EditBloodDonor;
 use App\Filament\Resources\BloodDonors\Pages\ListBloodDonors;
 use App\Filament\Resources\BloodDonors\Pages\ViewBloodDonor;
 use App\Filament\Resources\BloodDonors\Schemas\BloodDonorForm;
 use App\Filament\Resources\BloodDonors\Schemas\BloodDonorInfolist;
 use App\Filament\Resources\BloodDonors\Tables\BloodDonorsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\BloodDonor;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BloodDonorResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedUserGroup;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Blood Bank';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = BloodDonor::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Blood Bank';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'donor_number';
 
@@ -54,15 +63,5 @@ class BloodDonorResource extends Resource
             'view'   => ViewBloodDonor::route('/{record}'),
             'edit'   => EditBloodDonor::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

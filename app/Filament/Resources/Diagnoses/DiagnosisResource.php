@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Diagnoses;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Diagnoses\Pages\CreateDiagnosis;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Diagnoses\Pages\EditDiagnosis;
 use App\Filament\Resources\Diagnoses\Pages\ListDiagnoses;
 use App\Filament\Resources\Diagnoses\Pages\ViewDiagnosis;
 use App\Filament\Resources\Diagnoses\Schemas\DiagnosisForm;
 use App\Filament\Resources\Diagnoses\Schemas\DiagnosisInfolist;
 use App\Filament\Resources\Diagnoses\Tables\DiagnosesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Diagnosis;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class DiagnosisResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedClipboardDocumentList;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Clinical';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 8;
+    }
     protected static ?string $model = Diagnosis::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Clinical';
-
-    protected static ?int $navigationSort = 8;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class DiagnosisResource extends Resource
             'view'   => ViewDiagnosis::route('/{record}'),
             'edit'   => EditDiagnosis::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

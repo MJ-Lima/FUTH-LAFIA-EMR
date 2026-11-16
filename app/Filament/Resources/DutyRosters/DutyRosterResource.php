@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\DutyRosters;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\DutyRosters\Pages\CreateDutyRoster;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\DutyRosters\Pages\EditDutyRoster;
 use App\Filament\Resources\DutyRosters\Pages\ListDutyRosters;
 use App\Filament\Resources\DutyRosters\Pages\ViewDutyRoster;
 use App\Filament\Resources\DutyRosters\Schemas\DutyRosterForm;
 use App\Filament\Resources\DutyRosters\Schemas\DutyRosterInfolist;
 use App\Filament\Resources\DutyRosters\Tables\DutyRostersTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\DutyRoster;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class DutyRosterResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCalendarDays;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Duty & Staff Posting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = DutyRoster::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Duty & Staff Posting';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class DutyRosterResource extends Resource
             'view'   => ViewDutyRoster::route('/{record}'),
             'edit'   => EditDutyRoster::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

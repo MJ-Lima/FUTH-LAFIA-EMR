@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\BloodCrossmatches;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\BloodCrossmatches\Pages\CreateBloodCrossmatch;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\BloodCrossmatches\Pages\EditBloodCrossmatch;
 use App\Filament\Resources\BloodCrossmatches\Pages\ListBloodCrossmatches;
 use App\Filament\Resources\BloodCrossmatches\Pages\ViewBloodCrossmatch;
 use App\Filament\Resources\BloodCrossmatches\Schemas\BloodCrossmatchForm;
 use App\Filament\Resources\BloodCrossmatches\Schemas\BloodCrossmatchInfolist;
 use App\Filament\Resources\BloodCrossmatches\Tables\BloodCrossmatchesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\BloodCrossmatch;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BloodCrossmatchResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedArrowPathRoundedSquare;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Blood Bank';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = BloodCrossmatch::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPathRoundedSquare;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Blood Bank';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'crossmatch_number';
 
@@ -54,15 +63,5 @@ class BloodCrossmatchResource extends Resource
             'view'   => ViewBloodCrossmatch::route('/{record}'),
             'edit'   => EditBloodCrossmatch::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

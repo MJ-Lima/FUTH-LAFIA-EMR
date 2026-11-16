@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\MedicalAuditFindings;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\MedicalAuditFindings\Pages\CreateMedicalAuditFinding;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\MedicalAuditFindings\Pages\EditMedicalAuditFinding;
 use App\Filament\Resources\MedicalAuditFindings\Pages\ListMedicalAuditFindings;
 use App\Filament\Resources\MedicalAuditFindings\Pages\ViewMedicalAuditFinding;
 use App\Filament\Resources\MedicalAuditFindings\Schemas\MedicalAuditFindingForm;
 use App\Filament\Resources\MedicalAuditFindings\Schemas\MedicalAuditFindingInfolist;
 use App\Filament\Resources\MedicalAuditFindings\Tables\MedicalAuditFindingsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\MedicalAuditFinding;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class MedicalAuditFindingResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedExclamationTriangle;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Audit';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = MedicalAuditFinding::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationTriangle;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Audit';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'finding_number';
 
@@ -54,15 +63,5 @@ class MedicalAuditFindingResource extends Resource
             'view'   => ViewMedicalAuditFinding::route('/{record}'),
             'edit'   => EditMedicalAuditFinding::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

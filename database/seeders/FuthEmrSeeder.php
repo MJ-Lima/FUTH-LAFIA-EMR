@@ -74,16 +74,16 @@ class FuthEmrSeeder extends Seeder
         $password = Hash::make('Futh@2026');
 
         $usersData = [
-            ['email' => 'admin@futhlafia.gov.ng',          'name' => 'System Administrator', 'roles' => ['Super Admin'],                  'dept' => 1, 'clinic' => 1],
-            ['email' => 'dr.okoro@futhlafia.gov.ng',       'name' => 'Dr. Okoro Emmanuel',    'roles' => ['Doctor'],                       'dept' => 1, 'clinic' => 1],
-            ['email' => 'dr.adebayo@futhlafia.gov.ng',     'name' => 'Dr. Adebayo Folake',    'roles' => ['Doctor'],                       'dept' => 2, 'clinic' => 2],
-            ['email' => 'nurse.john@futhlafia.gov.ng',     'name' => 'Nurse John Aliyu',      'roles' => ['Nurse'],                        'dept' => 1, 'clinic' => 5],
-            ['email' => 'pharm.musa@futhlafia.gov.ng',     'name' => 'Pharm. Musa Ibrahim',   'roles' => ['Pharmacist'],                   'dept' => 8, 'clinic' => 8],
-            ['email' => 'lab.aisha@futhlafia.gov.ng',      'name' => 'Aisha Bala',            'roles' => ['Laboratory Scientist'],         'dept' => 6, 'clinic' => 6],
-            ['email' => 'rad.tunde@futhlafia.gov.ng',      'name' => 'Tunde Ogundimu',        'roles' => ['Radiographer'],                 'dept' => 7, 'clinic' => 7],
-            ['email' => 'records.hauwa@futhlafia.gov.ng',  'name' => 'Hauwa Musa',            'roles' => ['Medical Records Officer'],       'dept' => 1, 'clinic' => 1],
-            ['email' => 'accounts.david@futhlafia.gov.ng', 'name' => 'David Okonkwo',         'roles' => ['Accountant'],                   'dept' => 1, 'clinic' => 1],
-            ['email' => 'insurance.officer@futhlafia.gov.ng', 'name' => 'Amina Bello',       'roles' => ['Insurance Officer'],            'dept' => 1, 'clinic' => 1],
+            ['email' => 'admin@futhlafia.gov.ng',          'name' => 'System Administrator', 'roles' => ['super_admin'],                  'dept' => 1, 'clinic' => 1],
+            ['email' => 'dr.okoro@futhlafia.gov.ng',       'name' => 'Dr. Okoro Emmanuel',    'roles' => ['doctor'],                       'dept' => 1, 'clinic' => 1],
+            ['email' => 'dr.adebayo@futhlafia.gov.ng',     'name' => 'Dr. Adebayo Folake',    'roles' => ['doctor'],                       'dept' => 2, 'clinic' => 2],
+            ['email' => 'nurse.john@futhlafia.gov.ng',     'name' => 'Nurse John Aliyu',      'roles' => ['nurse'],                        'dept' => 1, 'clinic' => 5],
+            ['email' => 'pharm.musa@futhlafia.gov.ng',     'name' => 'Pharm. Musa Ibrahim',   'roles' => ['pharmacist'],                   'dept' => 8, 'clinic' => 8],
+            ['email' => 'lab.aisha@futhlafia.gov.ng',      'name' => 'Aisha Bala',            'roles' => ['laboratory_scientist'],         'dept' => 6, 'clinic' => 6],
+            ['email' => 'rad.tunde@futhlafia.gov.ng',      'name' => 'Tunde Ogundimu',        'roles' => ['radiographer'],                 'dept' => 7, 'clinic' => 7],
+            ['email' => 'records.hauwa@futhlafia.gov.ng',  'name' => 'Hauwa Musa',            'roles' => ['medical_records_officer'],       'dept' => 1, 'clinic' => 1],
+            ['email' => 'accounts.david@futhlafia.gov.ng', 'name' => 'David Okonkwo',         'roles' => ['accountant'],                   'dept' => 1, 'clinic' => 1],
+            ['email' => 'insurance.officer@futhlafia.gov.ng', 'name' => 'Amina Bello',       'roles' => ['insurance_officer'],            'dept' => 1, 'clinic' => 1],
         ];
 
         $staffTypes = [
@@ -95,8 +95,9 @@ class FuthEmrSeeder extends Seeder
             'lab.aisha@futhlafia.gov.ng'      => ['Senior Lab Scientist', 'Laboratory Scientist'],
             'rad.tunde@futhlafia.gov.ng'      => ['Senior Radiographer', 'Radiographer'],
             'records.hauwa@futhlafia.gov.ng'  => ['Medical Records Officer', 'Medical Records'],
-            'accounts.david@futhlafia.gov.ng' => ['Accountant', 'Accountant'],
-            'insurance.officer@futhlafia.gov.ng' => ['Insurance Officer', 'Other'],        ];
+            'accounts.david@futhlafia.gov.ng' => ['Account Officer', 'Accountant'],
+            'insurance.officer@futhlafia.gov.ng' => ['Insurance Officer', 'Other'],
+        ];
 
         foreach ($usersData as $ud) {
             // Create or update user
@@ -305,15 +306,15 @@ class FuthEmrSeeder extends Seeder
 
         // Role → department/clinic mapping
         $roleDeptMap = [
-            'Super Admin'            => ['dept' => 1, 'clinic' => 1],
-            'Doctor'                 => ['dept' => 1, 'clinic' => 1],
-            'Nurse'                  => ['dept' => 5, 'clinic' => 5],
-            'Pharmacist'             => ['dept' => 8, 'clinic' => 8],
-            'Laboratory Scientist'   => ['dept' => 6, 'clinic' => 6],
-            'Radiographer'           => ['dept' => 7, 'clinic' => 7],
-            'Medical Records Officer' => ['dept' => 1, 'clinic' => 1],
-            'Accountant'             => ['dept' => 1, 'clinic' => 1],
-            'Insurance Officer'      => ['dept' => 1, 'clinic' => 1],
+            'super_admin'            => ['dept' => 1, 'clinic' => 1],
+            'doctor'                 => ['dept' => 1, 'clinic' => 1],
+            'nurse'                  => ['dept' => 5, 'clinic' => 5],
+            'pharmacist'             => ['dept' => 8, 'clinic' => 8],
+            'laboratory_scientist'   => ['dept' => 6, 'clinic' => 6],
+            'radiographer'           => ['dept' => 7, 'clinic' => 7],
+            'medical_records_officer' => ['dept' => 1, 'clinic' => 1],
+            'accountant'             => ['dept' => 1, 'clinic' => 1],
+            'insurance_officer'      => ['dept' => 1, 'clinic' => 1],
         ];
 
         $adminUser = User::where('email', 'admin@futhlafia.gov.ng')->first();
@@ -339,7 +340,7 @@ class FuthEmrSeeder extends Seeder
                     'shift'          => 'Morning',
                     'shift_start'    => '08:00',
                     'shift_end'      => '16:00',
-                    'role_in_unit'   => ($primaryRole === 'Super Admin') ? 'In-Charge' : 'Officer',
+                    'role_in_unit'   => ($primaryRole === 'super_admin') ? 'In-Charge' : 'Officer',
                     'status'         => 'Active',
                     'posted_by'      => $adminUser?->id ?? 1,
                 ]

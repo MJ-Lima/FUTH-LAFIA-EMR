@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Vitals;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Vitals\Pages\CreateVitals;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Vitals\Pages\EditVitals;
 use App\Filament\Resources\Vitals\Pages\ListVitals;
 use App\Filament\Resources\Vitals\Pages\ViewVitals;
 use App\Filament\Resources\Vitals\Schemas\VitalsForm;
 use App\Filament\Resources\Vitals\Schemas\VitalsInfolist;
 use App\Filament\Resources\Vitals\Tables\VitalsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Vitals;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class VitalsResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedHeart;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Clinical';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = Vitals::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Clinical';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class VitalsResource extends Resource
             'view'   => ViewVitals::route('/{record}'),
             'edit'   => EditVitals::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

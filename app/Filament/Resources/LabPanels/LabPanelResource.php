@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\LabPanels;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\LabPanels\Pages\CreateLabPanel;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\LabPanels\Pages\EditLabPanel;
 use App\Filament\Resources\LabPanels\Pages\ListLabPanels;
 use App\Filament\Resources\LabPanels\Pages\ViewLabPanel;
 use App\Filament\Resources\LabPanels\Schemas\LabPanelForm;
 use App\Filament\Resources\LabPanels\Schemas\LabPanelInfolist;
 use App\Filament\Resources\LabPanels\Tables\LabPanelsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\LabPanel;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class LabPanelResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedBeaker;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Laboratory';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = LabPanel::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Laboratory';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class LabPanelResource extends Resource
             'view'   => ViewLabPanel::route('/{record}'),
             'edit'   => EditLabPanel::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

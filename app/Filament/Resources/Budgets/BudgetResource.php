@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Budgets;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Budgets\Pages\CreateBudget;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Budgets\Pages\EditBudget;
 use App\Filament\Resources\Budgets\Pages\ListBudgets;
 use App\Filament\Resources\Budgets\Pages\ViewBudget;
 use App\Filament\Resources\Budgets\Schemas\BudgetForm;
 use App\Filament\Resources\Budgets\Schemas\BudgetInfolist;
 use App\Filament\Resources\Budgets\Tables\BudgetsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Budget;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BudgetResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCurrencyDollar;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Accounting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
     protected static ?string $model = Budget::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCurrencyDollar;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Accounting';
-
-    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class BudgetResource extends Resource
             'view'   => ViewBudget::route('/{record}'),
             'edit'   => EditBudget::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

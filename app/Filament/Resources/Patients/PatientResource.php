@@ -2,35 +2,29 @@
 
 namespace App\Filament\Resources\Patients;
 
+use App\Filament\Traits\HasRoleBasedAccess;
 use App\Filament\Resources\Patients\Pages\{CreatePatient, EditPatient, ListPatients, ViewPatient};
-use App\Filament\Resources\Patients\Schemas\{PatientForm, PatientInfolist};
-use App\Filament\Resources\Patients\Tables\PatientsTable;
 use App\Filament\Traits\HasUnitScoping;
 use App\Models\Patient;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Resources\Patients\Tables\PatientsTable;
+use App\Filament\Resources\Patients\Schemas\PatientForm;
+use App\Filament\Resources\Patients\Schemas\PatientInfolist;
+use BackedEnum;
 
 class PatientResource extends Resource
 {
+    use HasRoleBasedAccess;
     use HasUnitScoping;
 
     protected static ?string $model = Patient::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Patient Management';
-
-    protected static ?int $navigationSort = 1;
-
-    protected static ?string $recordTitleAttribute = 'patientcode';
-
-    // Hide from navigation if user lacks "view patient" permission
-    public static function canViewAny(): bool
+    public static function getNavigationIcon(): Heroicon
     {
-        return auth()->user()?->can('view patient') ?? false;
+        return Heroicon::OutlinedUserGroup;
     }
 
     public static function form(Schema $schema): Schema
@@ -48,23 +42,69 @@ class PatientResource extends Resource
         return PatientsTable::configure($table);
     }
 
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
     public static function getPages(): array
     {
         return [
-            'index'  => ListPatients::route('/'),
+            'index' => ListPatients::route('/'),
             'create' => CreatePatient::route('/create'),
-            'view'   => ViewPatient::route('/{record}'),
-            'edit'   => EditPatient::route('/{record}/edit'),
+            'view' => ViewPatient::route('/{record}'),
+            'edit' => EditPatient::route('/{record}/edit'),
         ];
     }
 
-    public static function getNavigationBadge(): ?string
+    public static function canAccess(): bool
     {
-        return number_format(static::getEloquentQuery()->count());
+        return auth()->user()?->hasRole([
+            'super_admin', 'medical_administrator',
+            'head_of_department', 'head_of_unit', 'head_of_records',
+            'medical_records_officer',
+            'doctor', 'nurse', 'pharmacist',
+            'laboratory_scientist', 'radiographer',
+            'accountant', 'biller', 'cashier',
+        ]) ?? false;
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function canCreate(): bool
     {
-        return 'success';
+        return auth()->user()?->hasRole([
+            'super_admin',
+            'medical_administrator',
+            'head_of_records',
+            'medical_records_officer',
+            'head_of_department',
+        ]) ?? false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole([
+            'super_admin', 'medical_administrator',
+            'head_of_department', 'head_of_unit', 'head_of_records',
+            'medical_records_officer',
+            'doctor', 'nurse', 'pharmacist',
+            'laboratory_scientist', 'radiographer',
+            'accountant', 'biller', 'cashier',
+        ]) ?? false;
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return auth()->user()?->hasRole([
+            'super_admin', 'medical_administrator',
+            'head_of_records', 'medical_records_officer',
+            'head_of_department',
+        ]) ?? false;
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return auth()->user()?->hasRole([
+            'super_admin', 'medical_administrator',
+        ]) ?? false;
     }
 }

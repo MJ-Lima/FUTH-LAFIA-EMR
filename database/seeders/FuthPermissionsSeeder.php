@@ -9,6 +9,15 @@ class FuthPermissionsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Permission naming convention: filament-shield style
+     *   Format:   "<Action>:<Resource>"
+     *   Example:  "ViewAny:Patient", "Create:Patient", "Update:Patient"
+     *
+     * This matches:
+     *   - config/filament-shield.php (case=pascal, separator=:)
+     *   - app/Policies/*.php (PatientPolicy, UserPolicy, RolePolicy, etc.)
+     *   - app/Filament/Pages/Dashboard.php permission checks
      */
     public function run(): void
     {
@@ -16,57 +25,62 @@ class FuthPermissionsSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // ---------------------------------------------------------------
-        // 1. DEFINE RESOURCES — ONLY those with actual database tables
-        //    (removed: drugCategory, dispensingPoint, stockMovement, supplier,
-        //     labPanel, labTest, radiologyModality, procedureBooking,
-        //     reportTemplate, savedReport, bloodDonation, bloodUnit,
-        //     bloodRequest, bloodTransfusion, procedure)
+        // 1. DEFINE RESOURCES — those with actual database tables and/or
+        //    Filament Resources referenced by the Dashboard or Policies.
         // ---------------------------------------------------------------
         $resources = [
             // System
-            'user',
+            'User', 'Role',
             // Facility
-            'hospital', 'department', 'clinic',
+            'Hospital', 'Department', 'Clinic',
             // Staff & Patients
-            'staff', 'patient', 'encounter', 'appointment',
+            'Staff', 'Patient', 'Encounter', 'Appointment',
             // Clinical
-            'vitals', 'clinicalNote', 'allergy', 'diagnosis',
+            'Vitals', 'ClinicalNote', 'Allergy', 'Diagnosis',
             // Pharmacy
-            'drug', 'drugBatch', 'prescription',
+            'Drug', 'DrugBatch', 'Prescription',
             // Laboratory
-            'labOrder',
+            'LabOrder',
             // Radiology
-            'radiologyOrder',
+            'RadiologyOrder',
             // Scheduling
-            'dutyRoster', 'dutyPosting',
+            'DutyRoster', 'DutyPosting',
             // Insurance & Billing
-            'insuranceProvider', 'insurancePlan', 'patientInsurance',
-            'insuranceClaim', 'preAuthorization',
-            'service', 'invoice', 'payment',
+            'InsuranceProvider', 'InsurancePlan', 'PatientInsurance',
+            'InsuranceClaim', 'PreAuthorization',
+            'Service', 'Invoice', 'Payment',
             // Wards & Admissions
-            'ward', 'bed', 'admission',
+            'Ward', 'Bed', 'Admission',
             // Blood Bank
-            'bloodDonor',
+            'BloodDonor', 'BloodUnit',
+            // Others referenced by the Dashboard
+            'ProcedureBooking',
         ];
 
-        // Create 4 CRUD permissions per resource
+        // Standard filament-shield CRUD+ permissions per resource
+        $crudActions = ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny'];
+
         foreach ($resources as $resource) {
-            foreach (['view', 'create', 'update', 'delete'] as $action) {
-                Permission::firstOrCreate(['name' => "{$action} {$resource}", 'guard_name' => 'web']);
+            foreach ($crudActions as $action) {
+                Permission::firstOrCreate([
+                    'name'       => "{$action}:{$resource}",
+                    'guard_name' => 'web',
+                ]);
             }
         }
 
-        // System-level permissions
+        // System-level permissions (kept in human-readable form — these are
+        // NOT auto-generated and are checked explicitly in code).
         $systemPermissions = [
-            'view reportsDashboard',
-            'view auditLog',
-            'manage settings',
-            'manage roles',
-            'manage permissions',
-            'export data',
-            'import data',
-            'view any clinic data',
-            'view any department data',
+            'ViewReportsDashboard',
+            'ViewAuditLog',
+            'ManageSettings',
+            'ManageRoles',
+            'ManagePermissions',
+            'ExportData',
+            'ImportData',
+            'ViewAnyClinicData',
+            'ViewAnyDepartmentData',
         ];
 
         foreach ($systemPermissions as $perm) {
@@ -78,71 +92,95 @@ class FuthPermissionsSeeder extends Seeder
         // ---------------------------------------------------------------
         // 2. DEFINE ROLES AND PERMISSION MAPPING
         // ---------------------------------------------------------------
+        // Helper: build the 6 CRUD permission names for a resource.
+        $crudFor = function (string $resource) use ($crudActions): array {
+            return array_map(fn ($a) => "{$a}:{$resource}", $crudActions);
+        };
+
         $rolesConfig = [
-            'Super Admin' => [
+            'super_admin' => [
                 'type' => 'full',
             ],
-            'Doctor' => [
+            'doctor' => [
                 'resources' => [
-                    'patient', 'encounter', 'appointment',
-                    'vitals', 'clinicalNote', 'allergy', 'diagnosis',
-                    'prescription', 'labOrder', 'radiologyOrder',
-                    'admission', 'ward', 'bed', 'bloodDonor',
+                    'Patient', 'Encounter', 'Appointment',
+                    'Vitals', 'ClinicalNote', 'Allergy', 'Diagnosis',
+                    'Prescription', 'LabOrder', 'RadiologyOrder',
+                    'Admission', 'Ward', 'Bed', 'BloodDonor', 'BloodUnit',
+                    'ProcedureBooking',
                 ],
-                'extra' => ['view reportsDashboard', 'export data', 'view any clinic data'],
+                'extra' => ['ViewReportsDashboard', 'ExportData', 'ViewAnyClinicData'],
             ],
-            'Nurse' => [
+            'nurse' => [
                 'resources' => [
-                    'patient', 'encounter', 'appointment',
-                    'vitals', 'clinicalNote', 'allergy',
-                    'prescription', 'labOrder',
-                    'admission', 'ward', 'bed', 'bloodDonor',
+                    'Patient', 'Encounter', 'Appointment',
+                    'Vitals', 'ClinicalNote', 'Allergy',
+                    'Prescription', 'LabOrder',
+                    'Admission', 'Ward', 'Bed', 'BloodDonor',
                 ],
-                'extra' => ['view reportsDashboard'],
+                'extra' => ['ViewReportsDashboard'],
             ],
-            'Pharmacist' => [
+            'pharmacist' => [
                 'resources' => [
-                    'patient', 'encounter',
-                    'drug', 'drugBatch', 'prescription',
+                    'Patient', 'Encounter',
+                    'Drug', 'DrugBatch', 'Prescription',
                 ],
-                'extra' => ['view reportsDashboard', 'export data'],
+                'extra' => ['ViewReportsDashboard', 'ExportData'],
             ],
-            'Laboratory Scientist' => [
+            'laboratory_scientist' => [
                 'resources' => [
-                    'patient', 'encounter', 'labOrder',
+                    'Patient', 'Encounter', 'LabOrder',
                 ],
-                'extra' => ['view reportsDashboard'],
+                'extra' => ['ViewReportsDashboard'],
             ],
-            'Radiographer' => [
+            'radiographer' => [
                 'resources' => [
-                    'patient', 'encounter', 'radiologyOrder',
+                    'Patient', 'Encounter', 'RadiologyOrder',
                 ],
-                'extra' => ['view reportsDashboard'],
+                'extra' => ['ViewReportsDashboard'],
             ],
-            'Medical Records Officer' => [
+            'medical_records_officer' => [
                 'resources' => [
-                    'patient', 'encounter', 'appointment',
-                    'vitals', 'clinicalNote', 'diagnosis',
+                    'Patient', 'Encounter', 'Appointment',
+                    'Vitals', 'ClinicalNote', 'Diagnosis',
                 ],
-                'extra' => ['view reportsDashboard', 'export data'],
+                'extra' => ['ViewReportsDashboard', 'ExportData'],
             ],
-            'Accountant' => [
+            'accountant' => [
                 'resources' => [
-                    'patient', 'encounter',
-                    'service', 'invoice', 'payment',
-                    'insuranceProvider', 'insurancePlan', 'patientInsurance',
-                    'insuranceClaim', 'preAuthorization',
+                    'Patient', 'Encounter',
+                    'Service', 'Invoice', 'Payment',
+                    'InsuranceProvider', 'InsurancePlan', 'PatientInsurance',
+                    'InsuranceClaim', 'PreAuthorization',
                 ],
-                'extra' => ['view reportsDashboard', 'export data'],
+                'extra' => ['ViewReportsDashboard', 'ExportData'],
             ],
-            'Insurance Officer' => [
+            'insurance_officer' => [
                 'resources' => [
-                    'patient', 'encounter',
-                    'insuranceProvider', 'insurancePlan', 'patientInsurance',
-                    'insuranceClaim', 'preAuthorization',
-                    'service', 'invoice', 'payment',
+                    'Patient', 'Encounter',
+                    'InsuranceProvider', 'InsurancePlan', 'PatientInsurance',
+                    'InsuranceClaim', 'PreAuthorization',
+                    'Service', 'Invoice', 'Payment',
                 ],
-                'extra' => ['view reportsDashboard', 'export data'],
+                'extra' => ['ViewReportsDashboard', 'ExportData'],
+            ],
+            'medical_administrator' => [
+                'type' => 'full',
+            ],
+            'resident_doctor' => [
+                'resources' => [
+                    'Patient', 'Encounter', 'Appointment',
+                    'Vitals', 'ClinicalNote', 'Allergy', 'Diagnosis',
+                    'Prescription', 'LabOrder', 'RadiologyOrder',
+                    'Admission', 'Ward', 'Bed',
+                ],
+                'extra' => ['ViewReportsDashboard', 'ViewAnyClinicData'],
+            ],
+            'scientific_officer' => [
+                'resources' => [
+                    'Patient', 'Encounter', 'LabOrder',
+                ],
+                'extra' => ['ViewReportsDashboard', 'ExportData'],
             ],
         ];
 
@@ -156,9 +194,7 @@ class FuthPermissionsSeeder extends Seeder
             } else {
                 $permissionNames = [];
                 foreach ($config['resources'] as $resource) {
-                    foreach (['view', 'create', 'update', 'delete'] as $action) {
-                        $permissionNames[] = "{$action} {$resource}";
-                    }
+                    $permissionNames = array_merge($permissionNames, $crudFor($resource));
                 }
                 if (!empty($config['extra'])) {
                     $permissionNames = array_merge($permissionNames, $config['extra']);

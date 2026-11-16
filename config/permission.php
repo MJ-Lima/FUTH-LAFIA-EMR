@@ -198,9 +198,13 @@ return [
         /*
          * By default all permissions are cached for 24 hours to speed up performance.
          * When permissions or roles are updated the cache is flushed automatically.
+         *
+         * For this project we use a much shorter TTL (5 minutes) as a safety net:
+         * if any code path bypasses syncRoles()/assignRole() and forgets to clear
+         * the cache, the staleness window is at most 5 minutes instead of 24 hours.
          */
 
-        'expiration_time' => DateInterval::createFromDateString('24 hours'),
+        'expiration_time' => DateInterval::createFromDateString('5 minutes'),
 
         /*
          * The cache key used to store all permissions.

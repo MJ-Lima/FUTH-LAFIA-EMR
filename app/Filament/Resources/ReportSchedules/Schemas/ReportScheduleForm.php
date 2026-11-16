@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\ReportSchedules\Schemas;
 
-use Filament\Forms\Components\Select, TextInput, TimePicker, Toggle;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class ReportScheduleForm
 {
     public static function configure(Schema $schema): Schema

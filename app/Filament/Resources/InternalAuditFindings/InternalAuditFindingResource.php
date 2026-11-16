@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\InternalAuditFindings;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\InternalAuditFindings\Pages\CreateInternalAuditFinding;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\InternalAuditFindings\Pages\EditInternalAuditFinding;
 use App\Filament\Resources\InternalAuditFindings\Pages\ListInternalAuditFindings;
 use App\Filament\Resources\InternalAuditFindings\Pages\ViewInternalAuditFinding;
 use App\Filament\Resources\InternalAuditFindings\Schemas\InternalAuditFindingForm;
 use App\Filament\Resources\InternalAuditFindings\Schemas\InternalAuditFindingInfolist;
 use App\Filament\Resources\InternalAuditFindings\Tables\InternalAuditFindingsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\InternalAuditFinding;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class InternalAuditFindingResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedExclamationCircle;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Audit';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = InternalAuditFinding::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationCircle;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Audit';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'finding_number';
 
@@ -54,15 +63,5 @@ class InternalAuditFindingResource extends Resource
             'view'   => ViewInternalAuditFinding::route('/{record}'),
             'edit'   => EditInternalAuditFinding::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

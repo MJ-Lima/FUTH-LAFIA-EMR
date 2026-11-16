@@ -1,181 +1,231 @@
-# FUTH Lafia EMR — Federal University Teaching Hospital, Lafia
+# FUTH Lafia EMR — Role Normalization & Reference Data Update
 
-A complete Electronic Medical Record (EMR) system built on **Laravel 12 + Filament v5 + Spatie Permission**, designed for Federal University Teaching Hospital, Lafia (Nasarawa State, Nigeria).
+This package contains all the files needed to:
 
-## Highlights
+1. **Normalize role names to snake_case** across the entire codebase
+2. **Create sessions and password_reset_tokens tables** (defensive — already in consolidated migration)
+3. **Import large reference data** (ICD-10 codes, NACRS complaints, services catalog, Nigerian states & LGAs)
+4. **Fix user roles and login** so dashboard KPIs, quick actions, and role badges all work
 
-- **Green FUTH theme** (primary `#0f5132`) with the hospital logo
-- **Role-based dashboards** — every role (Super Admin, Doctor, Nurse, Pharmacist, Lab Scientist, Radiographer, Records Officer, Accountant, Insurance Officer) sees a different set of hero stats, quick actions, and the day's schedule
-- **Insurance module** — Providers, Plans, Patient Policies, Claims (with claim lines), Pre-Authorizations — modelled on NHIA / Nigerian HMO workflows
-- **Duty Posting module** — Post staff to a specific hospital + department + clinic + shift + date range. Active duty posting drives unit-based data scoping
-- **Unit-based access control** — `App\Filament\Traits\HasUnitScoping` filters every resource's Eloquent query by the logged-in user's currently-active duty posting's `hospital_id`. Super Admin / Medical Administrator bypass the filter
-- **International standards** — ICD-10 (diagnoses), LOINC (lab tests), ATC (drugs), NHIA-aligned tariffs
-- **28 Filament resources** covering Clinical, Pharmacy, Laboratory, Radiology, Insurance, Billing, and Duty Rosters
+## What Changed
 
-## Tech stack
+### Role Name Convention
 
-| Layer        | Tech                                              |
-|--------------|---------------------------------------------------|
-| Backend      | Laravel 12.x (PHP 8.2+)                           |
-| Admin UI     | Filament v5.x                                     |
-| Auth / RBAC  | Spatie laravel-permission + filament-shield       |
-| Database     | MySQL 8 / MariaDB 10+ (utf8mb4)                   |
-| Frontend     | Livewire v3, Tailwind CSS, Alpine.js              |
+**Before**: Roles used Title Case (`'Super Admin'`, `'Doctor'`, `'Medical Records Officer'`)
+**After**: Roles use snake_case (`'super_admin'`, `'doctor'`, `'medical_records_officer'`)
 
-## Project structure
+All 12 roles in the project are now snake_case:
 
-```
-app/
-├── Filament/
-│   ├── Pages/Dashboard.php             # Role-based dashboard
-│   ├── Traits/HasUnitScoping.php       # Unit-based access control
-│   ├── Widgets/StatsOverviewWidget.php # KPI cards
-│   └── Resources/                      # 28 resource folders
-│       ├── Patients/      Encounters/  Appointments/
-│       ├── Vitals/        ClinicalNotes/  Allergies/  Diagnoses/
-│       ├── Staff/         DutyRosters/  DutyPostings/
-│       ├── InsuranceProviders/  InsurancePlans/  PatientInsurance/
-│       │   InsuranceClaims/  PreAuthorizations/
-│       ├── Drugs/  DrugCategories/  DrugBatches/  Prescriptions/
-│       │   DispensingPoints/  StockMovements/  Suppliers/
-│       ├── LabPanels/  LabTests/  LabOrders/
-│       ├── RadiologyModalities/  RadiologyOrders/
-│       ├── Services/  Invoices/  Payments/
-│       └── Hospitals/  Departments/  Clinics/  Users/
-├── Models/                             # 30+ Eloquent models
-└── Providers/Filament/AdminPanelProvider.php  # Green theme + branding
+| Old Name                  | New Name                    |
+|---------------------------|-----------------------------|
+| Super Admin               | super_admin                 |
+| Medical Administrator     | medical_administrator       |
+| Doctor                    | doctor                      |
+| Resident Doctor           | resident_doctor             |
+| Nurse                     | nurse                       |
+| Pharmacist                | pharmacist                  |
+| Laboratory Scientist      | laboratory_scientist        |
+| Radiographer              | radiographer                |
+| Medical Records Officer   | medical_records_officer     |
+| Accountant                | accountant                 |
+| Insurance Officer         | insurance_officer           |
+| Scientific Officer        | scientific_officer          |
 
-database/
-├── migrations/                         # 27 migrations (existing + new)
-└── seeders/
-    ├── FuthPermissionsSeeder.php       # Role → permission matrix
-    └── FuthEmrSeeder.php               # NHIA providers, plans, policies, services, duty postings
-```
+### Files Updated
 
-## Installation (production deployment)
+**Migrations** (4 files):
+- `database/migrations/2026_09_03_000001_normalize_role_names_to_snake_case.php` — NEW, renames existing roles in DB
+- `database/migrations/2026_09_03_000002_create_sessions_and_password_reset_tokens.php` — NEW, defensive
+- `database/migrations/0000_00_00_000000_futh_emr_consolidated_migration.php` — fixed (removed invalid `after('id')` modifiers)
+- `database/migrations/2026_09_11_000001_create_notifications_table.php` — fixed (removed duplicate morphs index)
 
-```bash
-# 1. Clone & install dependencies
-composer install --optimize-autoloader --no-dev
+**App code** (19 files):
+- `app/Filament/Pages/*.php` — all 15 Filament pages with `hasRole()` calls updated
+- `app/Filament/BaseResource.php` — updated
+- `app/Filament/Traits/HasUnitScoping.php` — updated
+- `app/Models/User.php` — updated (`isSuperAdmin()`, `isMedicalAdmin()`)
+- `app/Models/DashboardWidgetSetting.php` — `ROLES` constant updated, added `resident_doctor` and `scientific_officer`
 
-# 2. Configure environment
-cp .env.example .env
-php artisan key:generate
+**Seeders** (6 files):
+- `database/seeders/FuthPermissionsSeeder.php` — uses snake_case role names + `PascalCase:Resource` permission names (matches filament-shield config + Policies)
+- `database/seeders/FuthEmrSeeder.php` — uses snake_case role names
+- `database/seeders/StaffSeeder.php` — fixed `staff_type` enum values (Title Case) and role assignments (snake_case)
+- `database/seeders/FuthModulesBatch3Seeder.php` — fixed `'occupation' => 'Nurse'` (was wrongly `'nurse'`)
+- `database/seeders/DatabaseSeeder.php` — added call to `ReferenceDataSqlImporterSeeder`
+- `database/seeders/ReferenceDataSqlImporterSeeder.php` — NEW, imports the 4 SQL data files
 
-# 3. Edit .env — set DB_CONNECTION=mysql, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+**SQL data files** (4 files in `database/seeders/sql/`):
+- `01_icd10_codes_fixed.sql` — 73,889 ICD-10 diagnosis codes
+- `02_presenting_complaints.sql` — 332 NACRS Nigeria presenting complaints
+- `03_services.sql` — 9,306 services + 46 service categories
+- `States and LGAs.sql` — Nigerian states and LGAs reference data
 
-# 4. Run migrations + seeders
-php artisan migrate --force
-php artisan db:seed --force
+**Views** (2 files):
+- `resources/views/filament/pages/dashboard.blade.php` — role badge displays Title Case (via `ucwords(str_replace('_', ' ', $role))`)
+- `resources/views/filament/pages/dashboard-widget-settings.blade.php` — role names display as Title Case
 
-# 5. Configure web server (Nginx/Apache) — document root = public/
-#    Or use `php artisan serve` for development
+**Role & Permission Cache Fix** (7 files) — fixes the "role changes don't reflect sometimes" issue:
+- `app/Filament/Resources/Users/Schemas/UserForm.php` — replaced `Select::relationship('roles', 'name')` with `Select::options() + dehydrated(false)` so roles are saved via Spatie's `syncRoles()` (not direct pivot writes)
+- `app/Filament/Resources/Users/Pages/EditUser.php` — calls `syncRoles()` in `afterSave`, flushes Spatie cache, invalidates user's active sessions
+- `app/Filament/Resources/Users/Pages/CreateUser.php` — calls `assignRole()` in `afterCreate`, flushes Spatie cache
+- `app/Filament/Resources/Roles/RoleResource.php` — replaced `CheckboxList::relationship('permissions', 'name')` with `CheckboxList::options() + dehydrated(false)` so permissions are saved via Spatie's `syncPermissions()`
+- `app/Filament/Resources/Roles/Pages/EditRole.php` — calls `syncPermissions()` in `afterSave`, flushes Spatie cache
+- `app/Filament/Resources/Roles/Pages/CreateRole.php` — calls `givePermissionTo()` in `afterCreate`, flushes Spatie cache
+- `config/permission.php` — reduced Spatie cache TTL from 24 hours to 5 minutes (safety net)
 
-# 6. Create storage symlink
-php artisan storage:link
-```
+**Why this fix matters**: Filament's `Select::relationship()` / `CheckboxList::relationship()` write directly to the pivot tables (`model_has_roles`, `role_has_permissions`), bypassing Spatie's `syncRoles()` / `syncPermissions()` methods. This leaves Spatie's permission cache stale, and `hasRole()` / `can()` checks return the old values until the cache expires (default: 24 hours). By using `->options()` + `->dehydrated(false)` and handling the save manually via `syncRoles()` / `syncPermissions()`, the cache is properly cleared on every change.
 
-## Default credentials
+## Installation
 
-| Email                                  | Password     | Role                      |
-|----------------------------------------|--------------|---------------------------|
-| admin@futhlafia.gov.ng                 | Futh@2026    | Super Admin               |
-| dr.okoro@futhlafia.gov.ng              | Futh@2026    | Doctor                    |
-| dr.adebayo@futhlafia.gov.ng            | Futh@2026    | Doctor (OBGYN)            |
-| nurse.john@futhlafia.gov.ng            | Futh@2026    | Nurse                     |
-| pharm.musa@futhlafia.gov.ng            | Futh@2026    | Pharmacist                |
-| lab.aisha@futhlafia.gov.ng             | Futh@2026    | Laboratory Scientist      |
-| rad.tunde@futhlafia.gov.ng             | Futh@2026    | Radiographer              |
-| records.hauwa@futhlafia.gov.ng         | Futh@2026    | Medical Records Officer   |
-| accounts.david@futhlafia.gov.ng        | Futh@2026    | Accountant                |
-| insurance.officer@futhlafia.gov.ng     | Futh@2026    | Insurance Officer         |
+### Step 1: Backup your current project
 
-**URL:** `http://<your-server>/admin/login`
-
-## Modules overview
-
-### Clinical
-- **Patients** — demographics, next-of-kin, insurance, with auto-generated patient codes (`FUTH-LF-YYYY-NNNNNN`)
-- **Encounters** — Outpatient / Emergency / Inpatient / Telemedicine / Follow-up visits
-- **Appointments** — booking, scheduling, check-in, no-show tracking
-- **Vitals** — full vital signs (BP, HR, RR, SpO₂, Temp, BMI, GCS, blood glucose, fetal HR, MUAC)
-- **Clinical Notes** — SOAP-format (Subjective / Objective / Assessment / Plan)
-- **Allergies** — drug / food / environment, with severity and reaction tracking
-- **Diagnoses** — ICD-10 coded, with type (Principal / Working / Discharge) and status
-
-### Duty & Staff Posting
-- **Duty Rosters** — weekly / monthly cycles
-- **Duty Postings** — assign staff to a hospital + department + clinic + shift + date range with role-in-unit (In-Charge / Supervisor / Officer / Assistant / Trainee). Active postings drive the unit-based data scoping
-
-### Insurance (NEW)
-- **Insurance Providers** — NHIA, HMOs, Private insurers (Hygeia, AXA Mansard, Reliance, Greenbay seeded)
-- **Insurance Plans** — tier (Formal / Informal / Equity / Vulnerable / Premium / Standard / VIP), benefit limits, copay, coverage flags (pharmacy / lab / radiology / inpatient / maternity / dental / optical)
-- **Patient Insurance** — policy enrolment, principal relationship, verification workflow, benefit utilisation tracking
-- **Insurance Claims** — submission lifecycle (Draft → Submitted → Acknowledged → Processing → Approved / Partially Approved / Rejected → Paid / Reversed) with claim line items per service
-- **Pre-Authorizations** — request pre-approval for high-cost services before delivery
-
-### Pharmacy
-- **Drugs** — full catalog with ATC codes, cost/selling prices, reorder levels, controlled/antenatal/pediatric flags
-- **Drug Categories / Drug Batches** — batch tracking with expiry, quarantine, stock balance
-- **Prescriptions** — prescriber → dispensing point workflow with priority (Routine / Urgent / STAT)
-- **Dispensing Points** — pharmacy sub-locations
-- **Stock Movements** — full audit trail (Receipt / Transfer / Dispense / Adjustment / Return / Disposal / Stock Take)
-- **Suppliers** — vendor management
-
-### Laboratory
-- **Lab Panels** (LOINC-coded) — grouped test panels with specimen type and turnaround time
-- **Lab Tests** (LOINC-coded) — individual tests with reference ranges
-- **Lab Orders** — order lifecycle (Pending → Sample Collected → In Progress → Completed → Verified / Cancelled / Rejected) with priority (Routine / Urgent / STAT / ASAP)
-
-### Radiology
-- **Modalities** (X-Ray, US, CT, MRI, etc.) with NHIA-aligned pricing
-- **Radiology Orders** — examination, body part, clinical indication, priority, full lifecycle
-
-### Billing & Finance
-- **Services** — chargeable services with NHIA / private / standard rates
-- **Invoices** — invoice lifecycle (Draft → Pending → Partially Paid → Paid / Overdue / Cancelled / Refunded), supports Cash / Insurance / NHIA / Corporate / Charity / Mixed modes
-- **Payments** — multiple payment methods (Cash / Card / Bank Transfer / Cheque / Mobile Money / POS / Insurance / Online), auto-updates invoice balances
-
-## Unit-based access control — how it works
-
-The `App\Filament\Traits\HasUnitScoping` trait overrides `getEloquentQuery()` on every resource. When a non-admin user logs in:
-
-1. The system looks up their currently **Active** `DutyPosting` (where `start_date <= today` and `end_date >= today`)
-2. All Filament queries are filtered by `hospital_id` matching that posting
-3. Super Admin and Medical Administrator bypass the filter and see all hospitals
-
-To reassign a staff member to a different unit:
-1. Open **Duty Postings** → Create
-2. Select the staff member, hospital, department, clinic, shift, and date range
-3. Set status to **Active** — this automatically marks their previous active posting as Completed
-4. From that moment, all data the staff member sees is scoped to the new unit
-
-## International standards compliance
-
-| Standard | Where used                                           |
-|----------|------------------------------------------------------|
-| ICD-10   | `diagnoses.icd10_code`                               |
-| LOINC    | `lab_panels.loinc_code`, `lab_tests.loinc_code`     |
-| ATC      | `drugs.atc_code`                                     |
-| SNOMED CT| `allergies.code` (optional)                          |
-| ISO 3166 | `patients.country`, states & LGAs (Nigerian seeded)  |
-| NHIA     | Insurance provider type, plan tiers, service tariffs|
-
-## Local development (this sandbox)
-
-A self-contained PHP 8.4 + MariaDB 11.8 runtime is installed under `/home/z/php-local/`. To start the EMR:
-
-```bash
-# Start MariaDB (if not running)
-/home/z/php-local/start.sh
-
-# Start Laravel dev server
-cd /home/z/my-project/futh-emr
-/home/z/php-local/bin/php-wrapper artisan serve --host=127.0.0.1 --port=8000
+```cmd
+cd C:\xampp\htdocs\futh-lafia-emr
+xcopy /E /I /Y . \backup\futh-lafia-emr-%date:~10,4%%date:~4,2%%date:~7,2%
 ```
 
-Then open `http://127.0.0.1:8000/admin/login` and log in with `admin@futhlafia.gov.ng / Futh@2026`.
+### Step 2: Extract this update package on top of your project
 
-## License
+Extract the contents of this zip directly into `C:\xampp\htdocs\futh-lafia-emr\`, allowing it to overwrite existing files. The directory structure in the zip mirrors your project, so files will land in the right place.
 
-Internal use — Federal University Teaching Hospital, Lafia.
+### Step 3: Drop and recreate the database (cleanest path)
+
+Open phpMyAdmin or MySQL command line:
+
+```sql
+DROP DATABASE IF EXISTS futh_lafia_emr;
+CREATE DATABASE futh_lafia_emr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### Step 4: Run migrations and seeders
+
+```cmd
+cd C:\xampp\htdocs\futh-lafia-emr
+php artisan migrate:fresh --seed --force
+php artisan optimize:clear
+```
+
+### Step 5: Start the server and log in
+
+```cmd
+php artisan serve
+```
+
+Visit http://127.0.0.1:8000/admin and log in:
+
+| Email                              | Password    | Role                |
+|------------------------------------|-------------|---------------------|
+| admin@futhlafia.gov.ng             | Futh@2026   | super_admin         |
+| dr.okoro@futhlafia.gov.ng          | Futh@2026   | doctor              |
+| dr.adebayo@futhlafia.gov.ng        | Futh@2026   | doctor              |
+| nurse.john@futhlafia.gov.ng        | Futh@2026   | nurse               |
+| pharm.musa@futhlafia.gov.ng        | Futh@2026   | pharmacist          |
+| lab.aisha@futhlafia.gov.ng         | Futh@2026   | laboratory_scientist|
+| rad.tunde@futhlafia.gov.ng         | Futh@2026   | radiographer        |
+| records.hauwa@futhlafia.gov.ng     | Futh@2026   | medical_records_officer |
+| accounts.david@futhlafia.gov.ng    | Futh@2026   | accountant          |
+| insurance.officer@futhlafia.gov.ng | Futh@2026   | insurance_officer   |
+cashier.peter@futhlafia.gov.ng
+php artisan schedule:work
+## Verification
+
+After logging in as `admin@futhlafia.gov.ng`:
+
+1. **Role badge** in top-right should show "Super Admin" (Title Case)
+2. **Dashboard title** should be "Administrator Dashboard"
+3. **KPI cards** should display: Total Patients, New Patients, Encounters Today, Appointments, Patient Queue, Completed Visits, Revenue Today, Pending Rx, Pending Labs, Pending Radiology, Active Admissions, Bed Occupancy, Insurance Claims, Blood Units, Outstanding, Staff
+4. **Quick Action buttons** should display: Register Patient, New Encounter, Book Appointment, New Prescription, Lab Order, Admit Patient, New Invoice, Record Payment, Insurance Claim
+5. **Charts** should display: Insured vs Private, Appointment Trend, Queue Overview, Patients by Clinic, Encounter Types, Bed Status
+6. **Side widgets** should display: Average Waiting Time, Longest Waiting Time, Average Length of Stay, Prescriptions Pending
+7. **Recent Activities** should show recent registrations and appointments
+8. **Doctor Worklist** should be visible for `doctor`, `resident_doctor`, `super_admin`, `medical_administrator` roles
+
+## Troubleshooting
+
+### "SQLSTATE[HY000]: General error: 1030 Got error 194"
+
+Orphaned InnoDB tablespace. See the conversation history — run:
+```sql
+DROP TABLE IF EXISTS <problematic_table>;
+```
+Or do a full DB drop and recreate (Step 3 above).
+
+### "SQLSTATE[42000]: 1064 Syntax error near 'after `id`'"
+
+This is fixed by the updated `0000_00_00_000000_futh_emr_consolidated_migration.php` — make sure you overwrote it with the version in this zip.
+
+### "SQLSTATE[42000]: 1061 Duplicate key name 'notifications_notifiable_type_notifiable_id_index'"
+
+This is fixed by the updated `2026_09_11_000001_create_notifications_table.php` — make sure you overwrote it.
+
+### Login fails with "Invalid credentials"
+
+Make sure `FuthEmrSeeder` ran successfully. Check that the `users` table has rows:
+```sql
+SELECT id, email, name FROM users;
+```
+If empty, run:
+```cmd
+php artisan db:seed --class=FuthEmrSeeder --force
+```
+
+### KPI cards or buttons still missing
+
+Clear all caches:
+```cmd
+php artisan optimize:clear
+php artisan permission:cache-reset
+php artisan view:clear
+php artisan config:clear
+```
+
+Then hard-refresh your browser (Ctrl+Shift+R).
+
+### ICD-10 / Services import failed
+
+The SQL imports can fail if your MySQL/MariaDB has a small `max_allowed_packet` setting. To fix:
+
+1. Open `C:\xampp\mysql\bin\my.ini`
+2. Under `[mysqld]`, add or change: `max_allowed_packet=64M`
+3. Restart MySQL from XAMPP Control Panel
+4. Re-run the import:
+   ```cmd
+   php artisan db:seed --class=ReferenceDataSqlImporterSeeder --force
+   ```
+
+## What Was NOT Changed
+
+- The `staff_type` enum column still uses Title Case values (`'Doctor'`, `'Nurse'`, etc.) — this is a database column constraint, not a role name
+- The `futh_emr_full_dump.sql` file in seeders still has Title Case role names — this file is NOT used by the seeders, it's a legacy dump
+- The `users_roles_relationship.sql` file from the upload was intentionally **not applied** — Spatie already provides a `model_has_roles` polymorphic pivot table that the codebase uses. Adding a separate `role_user` table would conflict.
+
+## Architecture Notes
+
+### Permission Naming Convention
+
+The project uses **filament-shield's** permission naming convention:
+
+- Format: `<Action>:<Resource>` (e.g., `ViewAny:Patient`, `Create:Invoice`)
+- Actions: `ViewAny`, `View`, `Create`, `Update`, `Delete`, `DeleteAny`
+- Resources: PascalCase model names (`Patient`, `Encounter`, `LabOrder`, etc.)
+
+This matches:
+- `config/filament-shield.php` (`case=pascal`, `separator=:`)
+- `app/Policies/*.php` (e.g., `PatientPolicy` checks `'ViewAny:Patient'`)
+- `app/Filament/Pages/Dashboard.php` (all `$user->can(...)` calls)
+
+### Role Naming Convention
+
+All role names are snake_case (`super_admin`, `medical_administrator`, etc.). This matches:
+- `app/Models/User.php` (`isSuperAdmin()`, `isMedicalAdmin()`)
+- All `hasRole()` calls throughout `app/`
+- `app/Models/DashboardWidgetSetting.php` `ROLES` constant
+- All seeder role assignments
+
+### Display Convention
+
+When showing role names to users, convert to Title Case using:
+```php
+ucwords(str_replace('_', ' ', $role))
+```
+This displays `super_admin` as `Super Admin`, `medical_administrator` as `Medical Administrator`, etc.

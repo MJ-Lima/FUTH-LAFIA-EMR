@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\RelationshipTypes;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\RelationshipTypes\Pages\CreateRelationshipType;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\RelationshipTypes\Pages\EditRelationshipType;
 use App\Filament\Resources\RelationshipTypes\Pages\ListRelationshipTypes;
 use App\Filament\Resources\RelationshipTypes\Pages\ViewRelationshipType;
 use App\Filament\Resources\RelationshipTypes\Schemas\RelationshipTypeForm;
 use App\Filament\Resources\RelationshipTypes\Schemas\RelationshipTypeInfolist;
 use App\Filament\Resources\RelationshipTypes\Tables\RelationshipTypesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\RelationshipType;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class RelationshipTypeResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedSquares2x2;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Patient Management';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
+    }
     protected static ?string $model = RelationshipType::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Patient Management';
-
-    protected static ?int $navigationSort = 6;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class RelationshipTypeResource extends Resource
             'view'   => ViewRelationshipType::route('/{record}'),
             'edit'   => EditRelationshipType::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

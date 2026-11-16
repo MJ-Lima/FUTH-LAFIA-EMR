@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\RadiologyOrders;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\RadiologyOrders\Pages\CreateRadiologyOrder;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\RadiologyOrders\Pages\EditRadiologyOrder;
 use App\Filament\Resources\RadiologyOrders\Pages\ListRadiologyOrders;
 use App\Filament\Resources\RadiologyOrders\Pages\ViewRadiologyOrder;
 use App\Filament\Resources\RadiologyOrders\Schemas\RadiologyOrderForm;
 use App\Filament\Resources\RadiologyOrders\Schemas\RadiologyOrderInfolist;
 use App\Filament\Resources\RadiologyOrders\Tables\RadiologyOrdersTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\RadiologyOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class RadiologyOrderResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedClipboardDocumentCheck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Radiology';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = RadiologyOrder::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Radiology';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'order_number';
 
@@ -54,15 +63,5 @@ class RadiologyOrderResource extends Resource
             'view'   => ViewRadiologyOrder::route('/{record}'),
             'edit'   => EditRadiologyOrder::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

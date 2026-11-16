@@ -15,8 +15,11 @@ class Admission extends Model
     protected $fillable = [
         'admission_number', 'hospital_id', 'patient_id', 'encounter_id',
         'ward_id', 'bed_id', 'admitting_doctor_id', 'attending_doctor_id',
-        'admission_date', 'discharge_date', 'admission_type', 'admission_source',
+        'resident_doctor_id', 'discharged_by',
+        'admission_date', 'discharge_date',
+        'admission_type', 'admission_source',
         'admission_diagnosis', 'admission_reason', 'clinical_notes',
+        'discharge_reason', 'discharge_diagnosis', 'discharge_summary',
         'status', 'created_by',
     ];
 
@@ -72,8 +75,11 @@ class Admission extends Model
     public function bed(): BelongsTo { return $this->belongsTo(Bed::class); }
     public function admittingDoctor(): BelongsTo { return $this->belongsTo(User::class, 'admitting_doctor_id'); }
     public function attendingDoctor(): BelongsTo { return $this->belongsTo(User::class, 'attending_doctor_id'); }
+    public function residentDoctor(): BelongsTo { return $this->belongsTo(User::class, 'resident_doctor_id'); }
+    public function dischargedBy(): BelongsTo { return $this->belongsTo(User::class, 'discharged_by'); }
     public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
     public function transfers(): HasMany { return $this->hasMany(BedTransfer::class); }
+    public function residentAdmissionNotes(): HasMany { return $this->hasMany(ResidentAdmissionNote::class); }
     public function dischargeSummary()
     {
         return $this->hasOne(DischargeSummary::class);

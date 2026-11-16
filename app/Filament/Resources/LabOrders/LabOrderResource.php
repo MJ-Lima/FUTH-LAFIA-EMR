@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\LabOrders;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\LabOrders\Pages\CreateLabOrder;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\LabOrders\Pages\EditLabOrder;
+use App\Filament\Resources\LabOrders\Pages\EnterLabResult;
 use App\Filament\Resources\LabOrders\Pages\ListLabOrders;
 use App\Filament\Resources\LabOrders\Pages\ViewLabOrder;
 use App\Filament\Resources\LabOrders\Schemas\LabOrderForm;
 use App\Filament\Resources\LabOrders\Schemas\LabOrderInfolist;
 use App\Filament\Resources\LabOrders\Tables\LabOrdersTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\LabOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +22,22 @@ use Filament\Tables\Table;
 
 class LabOrderResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedClipboardDocumentCheck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Laboratory';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = LabOrder::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Laboratory';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'order_number';
 
@@ -49,20 +59,11 @@ class LabOrderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListLabOrders::route('/'),
-            'create' => CreateLabOrder::route('/create'),
-            'view'   => ViewLabOrder::route('/{record}'),
-            'edit'   => EditLabOrder::route('/{record}/edit'),
+            'index'        => ListLabOrders::route('/'),
+            'create'       => CreateLabOrder::route('/create'),
+            'view'         => ViewLabOrder::route('/{record}'),
+            'edit'         => EditLabOrder::route('/{record}/edit'),
+            'result-entry' => EnterLabResult::route('/{record}/result-entry'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

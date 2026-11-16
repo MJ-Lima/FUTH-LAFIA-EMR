@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\Clinics\Schemas;
 
-use App\Models\Clinic;
+
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
-
+use App\Models\Clinic;
 class ClinicInfolist
 {
     public static function configure(Schema $schema): Schema

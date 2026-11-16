@@ -17,7 +17,7 @@ class PatientsTable
     {
         return $table
             ->columns([
-                TextColumn::make('patientcode')
+                TextColumn::make('hospital_no')
                     ->searchable(),
 				 TextColumn::make('hospital.name')
                     ->label('Hospital'),
@@ -48,8 +48,8 @@ class PatientsTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->visible(true),
+                EditAction::make()->visible(true),
             ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([

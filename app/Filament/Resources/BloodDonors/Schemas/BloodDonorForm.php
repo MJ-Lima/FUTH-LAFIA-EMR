@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\BloodDonors\Schemas;
 
-use Filament\Forms\Components\DatePicker, Select, TextInput, Textarea, Toggle;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class BloodDonorForm
 {
     public static function configure(Schema $schema): Schema

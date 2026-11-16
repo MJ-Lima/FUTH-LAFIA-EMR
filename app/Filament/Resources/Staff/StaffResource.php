@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Staff;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Staff\Pages\CreateStaff;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Staff\Pages\EditStaff;
 use App\Filament\Resources\Staff\Pages\ListStaff;
 use App\Filament\Resources\Staff\Pages\ViewStaff;
 use App\Filament\Resources\Staff\Schemas\StaffForm;
 use App\Filament\Resources\Staff\Schemas\StaffInfolist;
 use App\Filament\Resources\Staff\Tables\StaffTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Staff;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class StaffResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedIdentification;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Duty & Staff Posting';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = Staff::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Duty & Staff Posting';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'staff_number';
 
@@ -54,15 +63,5 @@ class StaffResource extends Resource
             'view'   => ViewStaff::route('/{record}'),
             'edit'   => EditStaff::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

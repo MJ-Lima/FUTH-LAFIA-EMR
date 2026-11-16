@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\JournalLines\Schemas;
 
-use Filament\Forms\Components\Select, TextInput;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class JournalLineForm
 {
     public static function configure(Schema $schema): Schema

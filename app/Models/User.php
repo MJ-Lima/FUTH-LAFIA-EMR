@@ -3,153 +3,110 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes, HasRoles;
+    use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
-        'hospital_id',
-        'department_id',
-        'default_clinic_id',
-        'name',
-        'email',
-        'password',
-        'phone',
-        'avatar_url',
-        'status',
-        'last_login_at',
-        'last_login_ip',
+        'name', 'email', 'password',
+        'hospital_id', 'department_id', 'default_clinic_id',
+        'phone', 'avatar_url', 'status',
+        'last_login_at', 'last_login_ip',
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
     protected function casts(): array
     {
         return [
-            'email'         => 'string',
-            'password'      => 'hashed',
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
             'last_login_at' => 'datetime',
         ];
     }
 
-    // =========================================
-    // RELATIONSHIPS
-    // =========================================
+    /* ---------------------------------------------------------------------
+     *  Relationships
+     * ------------------------------------------------------------------- */
+    public function hospital(): BelongsTo { return $this->belongsTo(Hospital::class); }
+    public function department(): BelongsTo { return $this->belongsTo(Department::class); }
+    public function defaultClinic(): BelongsTo { return $this->belongsTo(Clinic::class, 'default_clinic_id'); }
+    public function staff(): HasMany { return $this->hasMany(Staff::class); }
 
-    /** User belongs to a Hospital */
-    public function hospital()
-    {
-        return $this->belongsTo(Hospital::class);
-    }
-
-    /** User belongs to a Department */
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
-    }
-
-    /** User's default Clinic */
-    public function defaultClinic()
-    {
-        return $this->belongsTo(Clinic::class, 'default_clinic_id');
-    }
-
-    /** User has one Staff record */
-    public function staff()
-    {
-        return $this->hasOne(Staff::class);
-    }
-
-    /** Encounters created by this user (as attending provider — user_id FK) */
-    public function encounters()
-    {
-        return $this->hasMany(Encounter::class, 'user_id');
-    }
-
-    /** Encounters created by this user (as creator — created_by FK) */
-    public function createdEncounters()
-    {
-        return $this->hasMany(Encounter::class, 'created_by');
-    }
-
-    /** Appointments where user is the provider */
-    public function appointments()
-    {
-        return $this->hasMany(Appointment::class, 'provider_id');
-    }
-
-    /** Clinical notes authored by this user */
-    public function clinicalNotes()
-    {
-        return $this->hasMany(ClinicalNote::class, 'author_id');
-    }
-
-    /** Vitals recorded by this user */
-    public function recordedVitals()
-    {
-        return $this->hasMany(Vitals::class, 'recorded_by');
-    }
-
-    /** Prescriptions prescribed by this user */
-    public function prescriptions()
-    {
-        return $this->hasMany(Prescription::class, 'prescriber');
-    }
-
-    /** Lab orders placed by this user */
-    public function labOrders()
-    {
-        return $this->hasMany(LabOrder::class, 'ordering_provider');
-    }
-
-    /** Radiology orders placed by this user */
-    public function radiologyOrders()
-    {
-        return $this->hasMany(RadiologyOrder::class, 'ordering_provider');
-    }
-
-    /** Duty postings for this user */
-    public function dutyPostings()
+    public function dutyPostings(): HasMany
     {
         return $this->hasMany(DutyPosting::class);
     }
 
-    /** Admissions where user is the admitting doctor */
-    public function admissions()
+    /**
+     * Active duty posting as of "today" — drives unit-based data scoping.
+     */
+    public function currentDutyPosting()
     {
-        return $this->hasMany(Admission::class, 'admitting_doctor');
+        $today = now()->toDateString();
+
+        return $this->hasOne(DutyPosting::class)
+            ->where('status', 'Active')
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->latest('id');
     }
 
-    // =========================================
-    // HELPER METHODS
-    // =========================================
-
-    /** Get the user's primary role name */
-    public function getPrimaryRoleName(): ?string
+    /* ---------------------------------------------------------------------
+     *  Role helpers
+     * ------------------------------------------------------------------- */
+    public function hasAnyRole(array|string $roles): bool
     {
-        return $this->roles->first()?->name;
+        foreach ((array) $roles as $role) {
+            if ($this->hasRole($role)) return true;
+        }
+        return false;
     }
 
-    /** Check if user has any of the given roles */
-    public function hasAnyRole(array $roles): bool
+    public function isSuperAdmin(): bool { return $this->hasRole('super_admin'); }
+    public function isMedicalAdmin(): bool { return $this->hasAnyRole(['super_admin', 'medical_administrator']); }
+
+    /* ---------------------------------------------------------------------
+     *  Unit-based access scope helper
+     *  Returns the clinic_id and department_id the user is currently posted to.
+     *  Super Admin / Medical Administrator returns null (full access).
+     * ------------------------------------------------------------------- */
+    public function scopeContext(): ?array
     {
-        return $this->roles()->whereIn('name', $roles)->exists();
+        if ($this->isMedicalAdmin()) return null;
+
+        $posting = $this->currentDutyPosting;
+
+        if ($posting) {
+            return [
+                'hospital_id'   => $posting->hospital_id,
+                'department_id' => $posting->department_id,
+                'clinic_id'     => $posting->clinic_id,
+            ];
+        }
+
+        // Fall back to user's default assignment
+        return [
+            'hospital_id'   => $this->hospital_id,
+            'department_id' => $this->department_id,
+            'clinic_id'     => $this->default_clinic_id,
+        ];
     }
 
-    /** Get user's display name with title */
-    public function getDisplayName(): string
+    public function updateLastLogin(string $ip = null): void
     {
-        $staff = $this->staff;
-        $title = $staff?->title;
-
-        return trim(($title ? $title . ' ' : '') . $this->name);
+        $this->update([
+            'last_login_at' => now(),
+            'last_login_ip' => $ip,
+        ]);
     }
 }

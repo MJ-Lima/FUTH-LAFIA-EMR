@@ -1,57 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Filament\Resources\Roles\Pages;
 
 use App\Filament\Resources\Roles\RoleResource;
-use BezhanSalleh\FilamentShield\Support\Utils;
-use Filament\Actions\DeleteAction;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Override;
+use Spatie\Permission\PermissionRegistrar;
 
 class EditRole extends EditRecord
 {
-    public Collection $permissions;
-
     protected static string $resource = RoleResource::class;
 
-    protected function getActions(): array
-    {
-        return [
-            DeleteAction::make(),
-        ];
-    }
+    protected ?array $pendingPermissions = null;
 
-    #[Override]
+    /**
+     * Pull 'permissions' out of the form data before Filament saves.
+     * The field is marked ->dehydrated(false) in RoleResource::form(),
+     * so without this hook the value would be discarded.
+     */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->permissions = collect($data)
-            ->filter(fn (mixed $permission, string $key): bool => ! in_array($key, ['name', 'guard_name', 'select_all', Utils::getTenantModelForeignKey()], true))
-            ->values()
-            ->flatten()
-            ->unique();
+        $this->pendingPermissions = $data['permissions'] ?? null;
+        unset($data['permissions']);
 
-        if (Utils::isTenancyEnabled() && Arr::has($data, Utils::getTenantModelForeignKey()) && filled($data[Utils::getTenantModelForeignKey()])) {
-            return Arr::only($data, ['name', 'guard_name', Utils::getTenantModelForeignKey()]);
-        }
-
-        return Arr::only($data, ['name', 'guard_name']);
+        return $data;
     }
 
     protected function afterSave(): void
     {
-        $permissionModels = collect();
-        $this->permissions->each(function (string $permission) use ($permissionModels): void {
-            $permissionModels->push(Utils::getPermissionModel()::firstOrCreate([
-                'name' => $permission,
-                'guard_name' => $this->data['guard_name'],
-            ]));
-        });
+        $role = $this->record;
 
-        // @phpstan-ignore-next-line
-        $this->record->syncPermissions($permissionModels);
+        if ($this->pendingPermissions !== null) {
+            // syncPermissions() writes to role_has_permissions AND clears the cache.
+            $role->syncPermissions($this->pendingPermissions);
+
+            // Belt-and-suspenders: explicitly clear the cache.
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
+        }
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\DeleteAction::make(),
+        ];
     }
 }

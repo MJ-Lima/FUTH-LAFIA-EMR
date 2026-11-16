@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\DrugStockLevels;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\DrugStockLevels\Pages\CreateDrugStockLevel;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\DrugStockLevels\Pages\EditDrugStockLevel;
 use App\Filament\Resources\DrugStockLevels\Pages\ListDrugStockLevels;
 use App\Filament\Resources\DrugStockLevels\Pages\ViewDrugStockLevel;
 use App\Filament\Resources\DrugStockLevels\Schemas\DrugStockLevelForm;
 use App\Filament\Resources\DrugStockLevels\Schemas\DrugStockLevelInfolist;
 use App\Filament\Resources\DrugStockLevels\Tables\DrugStockLevelsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\DrugStockLevel;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class DrugStockLevelResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedClipboardDocumentCheck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Pharmacy';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 10;
+    }
     protected static ?string $model = DrugStockLevel::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
-
-    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class DrugStockLevelResource extends Resource
             'view'   => ViewDrugStockLevel::route('/{record}'),
             'edit'   => EditDrugStockLevel::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

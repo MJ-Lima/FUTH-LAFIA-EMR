@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Suppliers;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Suppliers\Pages\CreateSupplier;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Suppliers\Pages\EditSupplier;
 use App\Filament\Resources\Suppliers\Pages\ListSuppliers;
 use App\Filament\Resources\Suppliers\Pages\ViewSupplier;
 use App\Filament\Resources\Suppliers\Schemas\SupplierForm;
 use App\Filament\Resources\Suppliers\Schemas\SupplierInfolist;
 use App\Filament\Resources\Suppliers\Tables\SuppliersTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Supplier;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class SupplierResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedTruck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Pharmacy';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 8;
+    }
     protected static ?string $model = Supplier::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
-
-    protected static ?int $navigationSort = 8;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class SupplierResource extends Resource
             'view'   => ViewSupplier::route('/{record}'),
             'edit'   => EditSupplier::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

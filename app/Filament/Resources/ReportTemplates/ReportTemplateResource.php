@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ReportTemplates;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ReportTemplates\Pages\CreateReportTemplate;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ReportTemplates\Pages\EditReportTemplate;
 use App\Filament\Resources\ReportTemplates\Pages\ListReportTemplates;
 use App\Filament\Resources\ReportTemplates\Pages\ViewReportTemplate;
 use App\Filament\Resources\ReportTemplates\Schemas\ReportTemplateForm;
 use App\Filament\Resources\ReportTemplates\Schemas\ReportTemplateInfolist;
 use App\Filament\Resources\ReportTemplates\Tables\ReportTemplatesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ReportTemplate;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ReportTemplateResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedDocumentChartBar;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Reports';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = ReportTemplate::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentChartBar;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Reports';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class ReportTemplateResource extends Resource
             'view'   => ViewReportTemplate::route('/{record}'),
             'edit'   => EditReportTemplate::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

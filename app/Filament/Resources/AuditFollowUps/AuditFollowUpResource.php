@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\AuditFollowUps;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\AuditFollowUps\Pages\CreateAuditFollowUp;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\AuditFollowUps\Pages\EditAuditFollowUp;
 use App\Filament\Resources\AuditFollowUps\Pages\ListAuditFollowUps;
 use App\Filament\Resources\AuditFollowUps\Pages\ViewAuditFollowUp;
 use App\Filament\Resources\AuditFollowUps\Schemas\AuditFollowUpForm;
 use App\Filament\Resources\AuditFollowUps\Schemas\AuditFollowUpInfolist;
 use App\Filament\Resources\AuditFollowUps\Tables\AuditFollowUpsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\AuditFollowUp;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class AuditFollowUpResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedArrowPath;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Audit';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
+    }
     protected static ?string $model = AuditFollowUp::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPath;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Audit';
-
-    protected static ?int $navigationSort = 6;
 
     protected static ?string $recordTitleAttribute = 'follow_up_number';
 
@@ -54,15 +63,5 @@ class AuditFollowUpResource extends Resource
             'view'   => ViewAuditFollowUp::route('/{record}'),
             'edit'   => EditAuditFollowUp::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

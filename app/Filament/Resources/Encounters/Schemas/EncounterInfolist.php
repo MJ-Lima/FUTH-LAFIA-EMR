@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Encounters\Schemas;
 
-use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
 
+use Filament\Schemas\Schema;
+use Filament\Infolists\Components\TextEntry;
 class EncounterInfolist
 {
     public static function configure(Schema $schema): Schema

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\ProcedureSessions\Schemas;
 
-use Filament\Forms\Components\DateTimePicker, Select, TextInput, Textarea;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class ProcedureSessionForm
 {
     public static function configure(Schema $schema): Schema
@@ -17,7 +20,7 @@ class ProcedureSessionForm
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('procedure_booking_id')->label('Booking')->required()->relationship('procedure_booking', 'booking_number')->searchable()->preload(),
-                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('procedure_id')->label('Procedure')->required()->relationship('procedure', 'name')->searchable()->preload(),
                             Select::make('surgeon_id')->label('Surgeon')->relationship('surgeon', 'name')->searchable()->preload(),
                             Select::make('anaesthetist_id')->label('Anaesthetist')->relationship('anaesthetist', 'name')->searchable()->preload(),

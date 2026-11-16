@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\BedTransfers\Schemas;
 
+
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-
 class BedTransferInfolist
 {
     public static function configure(Schema $schema): Schema

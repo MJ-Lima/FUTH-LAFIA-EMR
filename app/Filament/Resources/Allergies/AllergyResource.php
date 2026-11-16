@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Allergies;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Allergies\Pages\CreateAllergy;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Allergies\Pages\EditAllergy;
 use App\Filament\Resources\Allergies\Pages\ListAllergies;
 use App\Filament\Resources\Allergies\Pages\ViewAllergy;
 use App\Filament\Resources\Allergies\Schemas\AllergyForm;
 use App\Filament\Resources\Allergies\Schemas\AllergyInfolist;
 use App\Filament\Resources\Allergies\Tables\AllergiesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Allergy;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class AllergyResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedExclamationTriangle;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Clinical';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 7;
+    }
     protected static ?string $model = Allergy::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationTriangle;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Clinical';
-
-    protected static ?int $navigationSort = 7;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class AllergyResource extends Resource
             'view'   => ViewAllergy::route('/{record}'),
             'edit'   => EditAllergy::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

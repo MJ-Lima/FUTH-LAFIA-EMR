@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Holidays;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Holidays\Pages\CreateHoliday;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Holidays\Pages\EditHoliday;
 use App\Filament\Resources\Holidays\Pages\ListHolidays;
 use App\Filament\Resources\Holidays\Pages\ViewHoliday;
 use App\Filament\Resources\Holidays\Schemas\HolidayForm;
 use App\Filament\Resources\Holidays\Schemas\HolidayInfolist;
 use App\Filament\Resources\Holidays\Tables\HolidaysTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Holiday;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class HolidayResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedGift;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Schedule Configuration';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = Holiday::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGift;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Schedule Configuration';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class HolidayResource extends Resource
             'view'   => ViewHoliday::route('/{record}'),
             'edit'   => EditHoliday::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

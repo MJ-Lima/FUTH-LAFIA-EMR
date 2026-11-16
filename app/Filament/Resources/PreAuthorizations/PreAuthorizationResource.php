@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\PreAuthorizations;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\PreAuthorizations\Pages\CreatePreAuthorization;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\PreAuthorizations\Pages\EditPreAuthorization;
 use App\Filament\Resources\PreAuthorizations\Pages\ListPreAuthorizations;
 use App\Filament\Resources\PreAuthorizations\Pages\ViewPreAuthorization;
 use App\Filament\Resources\PreAuthorizations\Schemas\PreAuthorizationForm;
 use App\Filament\Resources\PreAuthorizations\Schemas\PreAuthorizationInfolist;
 use App\Filament\Resources\PreAuthorizations\Tables\PreAuthorizationsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\PreAuthorization;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class PreAuthorizationResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedShieldCheck;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Insurance';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = PreAuthorization::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Insurance';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'authorization_number';
 
@@ -54,15 +63,5 @@ class PreAuthorizationResource extends Resource
             'view'   => ViewPreAuthorization::route('/{record}'),
             'edit'   => EditPreAuthorization::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

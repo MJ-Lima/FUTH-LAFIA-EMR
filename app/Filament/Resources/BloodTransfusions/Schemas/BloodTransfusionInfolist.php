@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\BloodTransfusions\Schemas;
 
+
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-
 class BloodTransfusionInfolist
 {
     public static function configure(Schema $schema): Schema

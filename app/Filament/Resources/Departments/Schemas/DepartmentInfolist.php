@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\Departments\Schemas;
 
-use App\Models\Department;
+
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
-
+use App\Models\Department;
 class DepartmentInfolist
 {
     public static function configure(Schema $schema): Schema

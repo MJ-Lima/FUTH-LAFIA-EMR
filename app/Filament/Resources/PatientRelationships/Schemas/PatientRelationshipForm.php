@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\PatientRelationships\Schemas;
 
-use Filament\Forms\Components\DatePicker, Select, TextInput, Textarea, Toggle;
+
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
 class PatientRelationshipForm
 {
     public static function configure(Schema $schema): Schema
@@ -16,7 +20,7 @@ class PatientRelationshipForm
                 Section::make('PatientRelationship Details')
                     ->schema([
                         Grid::make(2)->schema([
-                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'full_name')->searchable()->preload(),
+                            Select::make('patient_id')->label('Patient')->required()->relationship('patient', 'hospital_no')->getOptionLabelUsing(fn ($record) => $record?->full_name ?? 'Unknown')->searchable()->preload(),
                             Select::make('related_patient_id')->label('Related Patient')->relationship('related_patient', 'full_name')->searchable()->preload(),
                             Select::make('relationship_type_id')->label('Relationship Type')->required()->relationship('relationship_type', 'name')->searchable()->preload(),
                             TextInput::make('related_party_name')->label('Related Party Name (if not patient)'),

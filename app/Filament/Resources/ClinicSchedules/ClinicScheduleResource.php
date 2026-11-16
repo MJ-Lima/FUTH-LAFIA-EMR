@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ClinicSchedules;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ClinicSchedules\Pages\CreateClinicSchedule;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ClinicSchedules\Pages\EditClinicSchedule;
 use App\Filament\Resources\ClinicSchedules\Pages\ListClinicSchedules;
 use App\Filament\Resources\ClinicSchedules\Pages\ViewClinicSchedule;
 use App\Filament\Resources\ClinicSchedules\Schemas\ClinicScheduleForm;
 use App\Filament\Resources\ClinicSchedules\Schemas\ClinicScheduleInfolist;
 use App\Filament\Resources\ClinicSchedules\Tables\ClinicSchedulesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ClinicSchedule;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ClinicScheduleResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedCalendarDays;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Schedule Configuration';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
     protected static ?string $model = ClinicSchedule::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Schedule Configuration';
-
-    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class ClinicScheduleResource extends Resource
             'view'   => ViewClinicSchedule::route('/{record}'),
             'edit'   => EditClinicSchedule::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\BedTransfers;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\BedTransfers\Pages\CreateBedTransfer;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\BedTransfers\Pages\EditBedTransfer;
 use App\Filament\Resources\BedTransfers\Pages\ListBedTransfers;
 use App\Filament\Resources\BedTransfers\Pages\ViewBedTransfer;
 use App\Filament\Resources\BedTransfers\Schemas\BedTransferForm;
 use App\Filament\Resources\BedTransfers\Schemas\BedTransferInfolist;
 use App\Filament\Resources\BedTransfers\Tables\BedTransfersTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\BedTransfer;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class BedTransferResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedArrowsRightLeft;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Ward & Bed Management';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
     protected static ?string $model = BedTransfer::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Ward & Bed Management';
-
-    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'transfer_number';
 
@@ -54,15 +63,5 @@ class BedTransferResource extends Resource
             'view'   => ViewBedTransfer::route('/{record}'),
             'edit'   => EditBedTransfer::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

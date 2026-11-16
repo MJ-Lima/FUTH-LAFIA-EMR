@@ -264,7 +264,7 @@ return new class extends Migration
         // ---- Patients ----
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->string('patientcode', 200)->unique();
+            $table->string('hospital_no', 200)->unique();
             $table->enum('patient_type', ['private', 'nhia', 'nashia', 'retainership', 'corporate', 'other_insurance'])->default('private');
             $table->foreignId('hospital_id')->nullable()->constrained('hospitals')->nullOnDelete();
             $table->string('firstname', 200);
@@ -436,6 +436,7 @@ return new class extends Migration
 
         Schema::create('allergies', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->foreignId('recorded_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('encounter_id')->nullable()->constrained('encounters')->nullOnDelete();
@@ -455,6 +456,7 @@ return new class extends Migration
 
         Schema::create('diagnoses', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->foreignId('encounter_id')->nullable()->constrained('encounters')->nullOnDelete();
             $table->foreignId('recorded_by')->constrained('users')->cascadeOnDelete();
@@ -493,6 +495,7 @@ return new class extends Migration
         // So we use unsignedBigInteger without FK here, and add the FK after admissions is created
         Schema::create('beds', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('ward_id')->constrained('wards')->cascadeOnDelete();
             $table->string('bed_number')->unique();
             $table->string('code')->nullable();
@@ -536,6 +539,7 @@ return new class extends Migration
 
         Schema::create('bed_transfers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->string('transfer_number')->unique();
             $table->foreignId('admission_id')->constrained('admissions')->cascadeOnDelete();
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
@@ -552,6 +556,7 @@ return new class extends Migration
 
         Schema::create('discharge_summaries', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('admission_id')->constrained('admissions')->cascadeOnDelete();
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->foreignId('discharging_doctor_id')->constrained('users')->cascadeOnDelete();
@@ -640,6 +645,7 @@ return new class extends Migration
 
         Schema::create('insurance_plans', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('insurance_provider_id')->constrained('insurance_providers')->cascadeOnDelete();
             $table->string('name');
             $table->string('code')->unique();
@@ -669,6 +675,7 @@ return new class extends Migration
         // NOTE: Table name is 'patient_insurance' (singular) — all FKs must use explicit name
         Schema::create('patient_insurance', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->foreignId('insurance_provider_id')->constrained('insurance_providers')->cascadeOnDelete();
             $table->foreignId('insurance_plan_id')->constrained('insurance_plans')->cascadeOnDelete();
@@ -1040,6 +1047,7 @@ return new class extends Migration
         // ---- Pharmacy ----
         Schema::create('drug_categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->string('name');
             $table->string('code')->unique();
             $table->text('description')->nullable();
@@ -1075,6 +1083,7 @@ return new class extends Migration
 
         Schema::create('drug_batches', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('drug_id')->constrained('drugs')->cascadeOnDelete();
             $table->string('batch_number');
             $table->date('expiry_date')->nullable();
@@ -1090,6 +1099,7 @@ return new class extends Migration
 
         Schema::create('drug_interactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->foreignId('drug_a_id')->constrained('drugs')->cascadeOnDelete();
             $table->foreignId('drug_b_id')->constrained('drugs')->cascadeOnDelete();
             $table->enum('severity', ['Minor', 'Moderate', 'Major', 'Contraindicated'])->default('Moderate');
@@ -2007,6 +2017,7 @@ return new class extends Migration
 
         Schema::create('procedure_sessions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hospital_id')->nullable()->default(1);
             $table->string('session_number')->unique();
             $table->foreignId('procedure_booking_id')->constrained('procedure_bookings')->cascadeOnDelete();
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();

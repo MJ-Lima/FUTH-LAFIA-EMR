@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Prescriptions;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Prescriptions\Pages\CreatePrescription;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Prescriptions\Pages\EditPrescription;
 use App\Filament\Resources\Prescriptions\Pages\ListPrescriptions;
 use App\Filament\Resources\Prescriptions\Pages\ViewPrescription;
 use App\Filament\Resources\Prescriptions\Schemas\PrescriptionForm;
 use App\Filament\Resources\Prescriptions\Schemas\PrescriptionInfolist;
 use App\Filament\Resources\Prescriptions\Tables\PrescriptionsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Prescription;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class PrescriptionResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedDocumentText;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Pharmacy';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = Prescription::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'prescription_number';
 
@@ -54,15 +63,5 @@ class PrescriptionResource extends Resource
             'view'   => ViewPrescription::route('/{record}'),
             'edit'   => EditPrescription::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

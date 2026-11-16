@@ -1,8 +1,10 @@
 <?php
 namespace App\Filament\Resources\GeneralStoreMovements\Schemas;
+
+
+use Filament\Schemas\Schema;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 class GeneralStoreMovementInfolist
 {
     public static function configure(Schema $schema): Schema

@@ -13,20 +13,22 @@ class Patient extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'patientcode', 'patient_type', 'hospital_id', 'firstname', 'middlename', 'lastname', 'dob',
+        'hospital_no', 'patient_type', 'hospital_id', 'clinic_id', 'firstname', 'middlename', 'lastname', 'dob',
         'gender', 'bloodgroup', 'genotype', 'marital', 'religion', 'occupation',
-        'phonemain', 'phonealt', 'email', 'address', 'city', 'state', 'country',
+        'phonemain', 'phonealt', 'email', 'address', 'city', 'state', 'lga', 'country',
         'postalcode', 'nokname', 'nok_firstname', 'nok_middlename', 'relationship', 'nokphone', 'nokaddress',
-        'hereabout', 'notes', 'status', 'photo_path', 'thumbprint_path', 'thumbprint_data', 'biometric_captured_at', 'biometric_captured_by', 'verification_status', 'verified_at', 'verified_by', 'national_id', 'national_id_type',
+        'hereabout', 'notes', 'status', 'photo_path', 'thumbprint_path', 'thumbprint_data',
+        'biometric_captured_at', 'biometric_captured_by', 'verification_status', 'verified_at', 'verified_by',
+        'national_id', 'national_id_type',
     ];
 
     protected function casts(): array
     {
         return [
-            'dob'     => 'date',
-            'status'  => 'boolean',
-        'biometric_captured_at' => 'datetime',
-        'verified_at' => 'datetime',
+            'dob'                   => 'date',
+            'status'                => 'boolean',
+            'biometric_captured_at' => 'datetime',
+            'verified_at'           => 'datetime',
         ];
     }
 
@@ -47,15 +49,16 @@ class Patient extends Model
                 ->first();
 
             $next = $lastPatient
-                ? ((int) substr($lastPatient->patientcode, -6)) + 1
+                ? ((int) substr($lastPatient->hospital_no, -6)) + 1
                 : 1;
 
-            $patient->patientcode = sprintf('%s-%s-%06d', $prefix, $year, $next);
+            $patient->hospital_no = sprintf('%s-%s-%06d', $prefix, $year, $next);
         });
     }
 
     /* ---- Relations ---- */
     public function hospital(): BelongsTo { return $this->belongsTo(Hospital::class); }
+    public function clinic(): BelongsTo { return $this->belongsTo(Clinic::class); }
     public function encounters(): HasMany { return $this->hasMany(Encounter::class); }
     public function appointments(): HasMany { return $this->hasMany(Appointment::class); }
     public function vitals(): HasMany { return $this->hasMany(Vitals::class); }
@@ -77,14 +80,34 @@ class Patient extends Model
     public function isVerified(): bool { return $this->verification_status === 'Verified'; }
     public function verify(?int $verifierId = null): void { $this->update(['verification_status' => 'Verified', 'verified_at' => now(), 'verified_by' => $verifierId ?? Auth::id()]); }
 
-    /* ---- Helpers ---- */
-    public function fullName(): string
+    /* ---- Accessors (for Blade & Filament) ---- */
+    public function getFullNameAttribute(): string
     {
-        return trim("{$this->firstname} {$this->middlename} {$this->lastname}");
+        return trim(
+            implode(' ', array_filter([
+                $this->firstname,
+                $this->middlename,
+                $this->lastname,
+            ]))
+        );
     }
 
-    public function age(): int
+    public function getAgeAttribute(): ?string
     {
-        return $this->dob?->age ?? 0;
+        if (! $this->dob) {
+            return null;
+        }
+        $age = $this->dob->age;
+        return (string) $age . ' ' . ($age === 1 ? 'yr' : 'yrs');
+    }
+
+    public function getPatientcodeAttribute(): ?string
+    {
+        return $this->hospital_no;
+    }
+
+    public function getMrnAttribute(): ?string
+    {
+        return $this->hospital_no;
     }
 }

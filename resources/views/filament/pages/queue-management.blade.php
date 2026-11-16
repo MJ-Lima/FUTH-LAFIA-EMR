@@ -85,7 +85,7 @@
                                         {{ $item->queue_number ?? ($item->clinic?->code ?? 'GOPD') . '-' . str_pad($loop->iteration, 3, '0', STR_PAD_LEFT) }}
                                     </td>
                                     <td class="py-3 px-4 text-gray-600">
-                                        {{ $item->patient?->patientcode ?? '—' }}
+                                        {{ $item->patient?->hospital_no ?? '—' }}
                                     </td>
                                     <td class="py-3 px-4">
                                         <p class="font-medium text-gray-900">{{ $item->patient?->fullName() ?? 'Unknown' }}</p>

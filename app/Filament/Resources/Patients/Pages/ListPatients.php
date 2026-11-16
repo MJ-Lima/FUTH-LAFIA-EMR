@@ -10,11 +10,10 @@ class ListPatients extends ListRecords
 {
     protected static string $resource = PatientResource::class;
 
-    public function getHeaderActions(): array
+    protected function getHeaderActions(): array
     {
-        if (!auth()->user()?->can('create patient')) {
-            return [];
-        }
-        return [CreateAction::make()];  
+        return [
+            CreateAction::make()->visible(true),
+        ];
     }
 }

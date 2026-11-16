@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Encounters;
 
+use App\Filament\Traits\HasRoleBasedAccess;
 use App\Filament\Resources\Encounters\Pages\CreateEncounter;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Encounters\Pages\EditEncounter;
 use App\Filament\Resources\Encounters\Pages\ListEncounters;
 use App\Filament\Resources\Encounters\Pages\ViewEncounter;
@@ -18,9 +20,13 @@ use Filament\Tables\Table;
 
 class EncounterResource extends Resource
 {
-    protected static ?string $model = Encounter::class;
+    use HasRoleBasedAccess;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
+    protected static ?string $model = Encounter::class;
 
     protected static ?string $recordTitleAttribute = 'title';
 

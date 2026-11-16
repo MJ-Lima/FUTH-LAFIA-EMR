@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ProcedureCategories;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ProcedureCategories\Pages\CreateProcedureCategory;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ProcedureCategories\Pages\EditProcedureCategory;
 use App\Filament\Resources\ProcedureCategories\Pages\ListProcedureCategories;
 use App\Filament\Resources\ProcedureCategories\Pages\ViewProcedureCategory;
 use App\Filament\Resources\ProcedureCategories\Schemas\ProcedureCategoryForm;
 use App\Filament\Resources\ProcedureCategories\Schemas\ProcedureCategoryInfolist;
 use App\Filament\Resources\ProcedureCategories\Tables\ProcedureCategoriesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ProcedureCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ProcedureCategoryResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedSwatch;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Procedures';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = ProcedureCategory::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSwatch;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Procedures';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class ProcedureCategoryResource extends Resource
             'view'   => ViewProcedureCategory::route('/{record}'),
             'edit'   => EditProcedureCategory::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Payments;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Payments\Pages\CreatePayment;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Payments\Pages\EditPayment;
 use App\Filament\Resources\Payments\Pages\ListPayments;
 use App\Filament\Resources\Payments\Pages\ViewPayment;
 use App\Filament\Resources\Payments\Schemas\PaymentForm;
 use App\Filament\Resources\Payments\Schemas\PaymentInfolist;
 use App\Filament\Resources\Payments\Tables\PaymentsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Payment;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class PaymentResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedBanknotes;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Billing & Finance';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
     protected static ?string $model = Payment::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Billing & Finance';
-
-    protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'payment_number';
 
@@ -54,15 +63,5 @@ class PaymentResource extends Resource
             'view'   => ViewPayment::route('/{record}'),
             'edit'   => EditPayment::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\ClinicalNotes;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\ClinicalNotes\Pages\CreateClinicalNote;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\ClinicalNotes\Pages\EditClinicalNote;
 use App\Filament\Resources\ClinicalNotes\Pages\ListClinicalNotes;
 use App\Filament\Resources\ClinicalNotes\Pages\ViewClinicalNote;
 use App\Filament\Resources\ClinicalNotes\Schemas\ClinicalNoteForm;
 use App\Filament\Resources\ClinicalNotes\Schemas\ClinicalNoteInfolist;
 use App\Filament\Resources\ClinicalNotes\Tables\ClinicalNotesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\ClinicalNote;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class ClinicalNoteResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedDocumentText;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Clinical';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
+    }
     protected static ?string $model = ClinicalNote::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Clinical';
-
-    protected static ?int $navigationSort = 6;
 
     protected static ?string $recordTitleAttribute = 'note_number';
 
@@ -54,15 +63,5 @@ class ClinicalNoteResource extends Resource
             'view'   => ViewClinicalNote::route('/{record}'),
             'edit'   => EditClinicalNote::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

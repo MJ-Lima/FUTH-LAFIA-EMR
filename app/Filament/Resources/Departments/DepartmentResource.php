@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Departments;
 
+use App\Filament\Traits\HasRoleBasedAccess;
 use App\Filament\Resources\Departments\Pages\CreateDepartment;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Departments\Pages\EditDepartment;
 use App\Filament\Resources\Departments\Pages\ListDepartments;
 use App\Filament\Resources\Departments\Pages\ViewDepartment;
@@ -18,9 +20,13 @@ use Filament\Tables\Table;
 
 class DepartmentResource extends Resource
 {
-    protected static ?string $model = Department::class;
+    use HasRoleBasedAccess;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
+    protected static ?string $model = Department::class;
 
     public static function form(Schema $schema): Schema
     {

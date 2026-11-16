@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Wards;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\Wards\Pages\CreateWard;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\Wards\Pages\EditWard;
 use App\Filament\Resources\Wards\Pages\ListWards;
 use App\Filament\Resources\Wards\Pages\ViewWard;
 use App\Filament\Resources\Wards\Schemas\WardForm;
 use App\Filament\Resources\Wards\Schemas\WardInfolist;
 use App\Filament\Resources\Wards\Tables\WardsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\Ward;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class WardResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedBuildingOffice2;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Ward & Bed Management';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = Ward::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Ward & Bed Management';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class WardResource extends Resource
             'view'   => ViewWard::route('/{record}'),
             'edit'   => EditWard::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

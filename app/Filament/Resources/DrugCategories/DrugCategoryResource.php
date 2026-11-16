@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\DrugCategories;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\DrugCategories\Pages\CreateDrugCategory;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\DrugCategories\Pages\EditDrugCategory;
 use App\Filament\Resources\DrugCategories\Pages\ListDrugCategories;
 use App\Filament\Resources\DrugCategories\Pages\ViewDrugCategory;
 use App\Filament\Resources\DrugCategories\Schemas\DrugCategoryForm;
 use App\Filament\Resources\DrugCategories\Schemas\DrugCategoryInfolist;
 use App\Filament\Resources\DrugCategories\Tables\DrugCategoriesTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\DrugCategory;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class DrugCategoryResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedTag;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Pharmacy';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
     protected static ?string $model = DrugCategory::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Pharmacy';
-
-    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'code';
 
@@ -54,15 +63,5 @@ class DrugCategoryResource extends Resource
             'view'   => ViewDrugCategory::route('/{record}'),
             'edit'   => EditDrugCategory::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

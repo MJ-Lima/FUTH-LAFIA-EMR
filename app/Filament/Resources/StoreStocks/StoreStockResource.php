@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\StoreStocks;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\StoreStocks\Pages\CreateStoreStock;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\StoreStocks\Pages\EditStoreStock;
 use App\Filament\Resources\StoreStocks\Pages\ListStoreStocks;
 use App\Filament\Resources\StoreStocks\Pages\ViewStoreStock;
 use App\Filament\Resources\StoreStocks\Schemas\StoreStockForm;
 use App\Filament\Resources\StoreStocks\Schemas\StoreStockInfolist;
 use App\Filament\Resources\StoreStocks\Tables\StoreStocksTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\StoreStock;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class StoreStockResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedRectangleStack;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Store & Inventory';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
     protected static ?string $model = StoreStock::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Store & Inventory';
-
-    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class StoreStockResource extends Resource
             'view'   => ViewStoreStock::route('/{record}'),
             'edit'   => EditStoreStock::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }

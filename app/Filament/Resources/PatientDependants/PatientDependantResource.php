@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\PatientDependants;
 
+use App\Filament\Traits\HasRoleBasedAccess;
+
 use App\Filament\Resources\PatientDependants\Pages\CreatePatientDependant;
+use App\Filament\Traits\HasUnitScoping;
 use App\Filament\Resources\PatientDependants\Pages\EditPatientDependant;
 use App\Filament\Resources\PatientDependants\Pages\ListPatientDependants;
 use App\Filament\Resources\PatientDependants\Pages\ViewPatientDependant;
 use App\Filament\Resources\PatientDependants\Schemas\PatientDependantForm;
 use App\Filament\Resources\PatientDependants\Schemas\PatientDependantInfolist;
 use App\Filament\Resources\PatientDependants\Tables\PatientDependantsTable;
-use App\Filament\Traits\HasUnitScoping;
 use App\Models\PatientDependant;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -19,15 +21,22 @@ use Filament\Tables\Table;
 
 class PatientDependantResource extends Resource
 {
-    use HasUnitScoping;
+    use HasRoleBasedAccess;
 
+    public static function getNavigationIcon(): Heroicon
+    {
+        return Heroicon::OutlinedUserGroup;
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return 'Patient Management';
+    }
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
     protected static ?string $model = PatientDependant::class;
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Patient Management';
-
-    protected static ?int $navigationSort = 5;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,15 +63,5 @@ class PatientDependantResource extends Resource
             'view'   => ViewPatientDependant::route('/{record}'),
             'edit'   => EditPatientDependant::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return number_format(static::getEloquentQuery()->count());
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'success';
     }
 }
